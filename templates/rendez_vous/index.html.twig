@@ -1,0 +1,126 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Disponibilités - Cabinet Martin{% endblock %}
+
+{% block main %}
+  <style>
+    .example-wrapper {
+      margin: 1em auto;
+      max-width: 800px;
+      width: 95%;
+      font: 18px/1.5 sans-serif;
+    }
+
+    .example-wrapper code {
+      background: #F5F5F5;
+      padding: 2px 6px;
+    }
+
+    .availability-table .btn {
+      min-width: 64px;
+    }
+  </style>
+
+  <div class="example-wrapper">
+    <h1>Les disponibilités</h1>
+
+    <div class="container py-4">
+      <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+        <h1 class="h4 m-0">Disponibilités (jours ouvrés)</h1>
+
+        <div class="d-flex gap-2 mb-3">
+          {# Reculer d’un jour (jamais < aujourd’hui) #}
+          <a
+            class="btn btn-outline-secondary {{ offset == 0 ? 'disabled' : '' }}"
+            href="{{ path('app_rendez_vous', { mode: 'move', day: -1 }) }}"
+            aria-disabled="{{ offset == 0 ? 'true' : 'false' }}"
+          >← Jour précédent</a>
+
+          {# Avancer d’un jour (indéfiniment) #}
+          <a
+            class="btn btn-outline-secondary"
+            href="{{ path('app_rendez_vous', { mode: 'move', day: 1 }) }}"
+          >Jour suivant →</a>
+
+          {# Aller directement à aujourd’hui #}
+          <a
+            class="btn btn-outline-primary"
+            href="{{ path('app_rendez_vous', { mode: 'reset', day: 0 }) }}"
+          >Aujourd’hui</a>
+        </div>
+      </div>
+
+      {# Légende médecins #}
+      <div class="mb-3">
+        <strong>Médecins :</strong>
+        {% for d in doctors %}
+          <span class="badge bg-secondary me-2">{{ d.name }} — {{ d.speciality }}</span>
+        {% endfor %}
+      </div>
+
+      {# Tableau des disponibilités #}
+      <div class="table-responsive">
+        <table class="table table-bordered align-middle availability-table">
+          <thead class="table-light">
+            <tr>
+              <th style="width: 220px">Médecin</th>
+              {% set jours = {
+                1: 'lundi',
+                2: 'mardi',
+                3: 'mercredi',
+                4: 'jeudi',
+                5: 'vendredi',
+                6: 'samedi',
+                7: 'dimanche'
+              } %}
+
+              {% for ymd, col in calendar %}
+                {# ymd est une string 'YYYY-MM-DD' => Twig sait la parser #}
+                {% set w = ymd|date('N', 'Europe/Paris') %}
+                <th class="text-center">
+                  {{ jours[w] | capitalize }} {{ ymd|date('d M', 'Europe/Paris') }}
+                </th>
+              {% endfor %}
+            </tr>
+          </thead>
+          <tbody>
+            {% for d in doctors %}
+              <tr>
+                <th>
+                  {{ d.name }}
+                  <small class="text-muted">({{ d.speciality }})</small>
+                </th>
+
+                {% for ymd, col in calendar %}
+                  {% set slots = col.slots[d.id] ?? [] %}
+                  <td>
+                    <div class="d-flex flex-wrap gap-2">
+                      {% for s in slots %}
+                        {% if s.available %}
+                          <a
+                            class="btn btn-sm btn-outline-primary"
+                            href="{{ path('reservation_new', {'doctor': d.id, 'slot': s.iso}) }}"
+                          >
+                            {{ s.time }}
+                          </a>
+                        {% else %}
+                          <span class="btn btn-sm btn-outline-secondary disabled" aria-disabled="true">
+                            {{ s.time }}
+                          </span>
+                        {% endif %}
+                      {% endfor %}
+
+                      {% if slots is empty %}
+                        <span class="text-muted">Fermé</span>
+                      {% endif %}
+                    </div>
+                  </td>
+                {% endfor %}
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+{% endblock %}

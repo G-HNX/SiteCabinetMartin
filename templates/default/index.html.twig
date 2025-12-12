@@ -1,0 +1,259 @@
+{% extends 'base.html.twig' %}
+
+{% block main %}
+ <style>
+    .main { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif;}    
+</style>
+
+
+ <section id="hero" class="hero section light-background">
+  <img src="{{ asset('/img/hero-bg.jpg') }}" alt="Cabinet médical Martin" >
+
+  <div class="container position-relative">
+    <div class="welcome" >
+      <h2>Bienvenue au Cabinet Martin</h2>
+      <p>Deux médecins complémentaires pour un suivi global : <strong>médecine interne</strong> et <strong>médecine générale</strong>.</p>
+    </div>
+
+    <div class="content row gy-4">
+      <div class="col-lg-4 d-flex align-items-stretch">
+        <div class="why-box" >
+          <h3>Pourquoi nous choisir ?</h3>
+          <p>
+            <strong>Dr Martin (médecine interne)</strong> : prise en charge des maladies chroniques, diagnostics complexes, coordination des spécialistes.<br>
+            <strong>Dr House (médecine générale)</strong> : soins du quotidien, prévention, petites urgences non vitales.<br>
+            Disponibilités rapides, dossier médical suivi et communication claire.
+          </p>
+          <div class="text-center">
+            <a href="#about" class="more-btn"><span>En savoir plus</span> <i class="bi bi-chevron-right"></i></a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-8 d-flex align-items-stretch">
+        <div class="d-flex flex-column justify-content-center">
+          <div class="row gy-4">
+            <div class="col-xl-6 d-flex align-items-stretch">
+              <div class="icon-box" >
+                <i class="bi bi-clipboard2-pulse"></i>
+                <h4>Suivi personnalisé</h4>
+                <p>Bilan complet, plan de soins adapté, éducation thérapeutique et objectifs mesurables.</p>
+              </div>
+            </div>
+            <div class="col-xl-6 d-flex align-items-stretch">
+              <div class="icon-box" >
+                <i class="bi bi-shield-check"></i>
+                <h4>Prévention & dépistage</h4>
+                <p>Vaccins, dépistages, conseils hygiène de vie et programmes de prévention.</p>
+              </div>
+            </div>
+            <div class="col-xl-6 d-flex align-items-stretch">
+              <div class="icon-box" >
+                <i class="bi bi-people"></i>
+                <h4>Coordination des soins</h4>
+                <p>Échanges rapides avec les spécialistes et comptes rendus accessibles.</p>
+              </div>
+            </div>
+            <div class="col-xl-6 d-flex align-items-stretch">
+              <div class="icon-box" >
+                <i class="bi bi-prescription"></i>
+                <h4>Pharmacie</h4>
+                <p>Achat de médicaments.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div> <!-- /col -->
+    </div> <!-- /row -->
+  </div>
+</section>
+
+
+
+
+<section id="services" class="services section">
+  <div class="container section-title">
+    <h2>Nos services</h2>
+    <p>Un accompagnement complet : prévention, diagnostic, traitement et suivi.</p>
+  </div>
+
+  <div class="container">
+    <div class="row gy-4">
+      <div class="col-lg-6 col-md-12" >
+        <div class="service-item position-relative">
+          <div class="icon"><i class="fas fa-stethoscope"></i></div>
+          <h3>Consultations de médecine générale</h3>
+          <p>Suivi adulte et enfant, certificats, renouvellements, conseils de prévention.</p>
+        </div>
+      </div>
+
+      <div class="col-lg-6 col-md-12" >
+        <div class="service-item position-relative">
+          <div class="icon"><i class="fas fa-heartbeat"></i></div>
+          <h3>Médecine interne</h3>
+          <p>Prise en charge des pathologies complexes et des maladies chroniques.</p>
+        </div>
+      </div>
+
+      <div class="col-lg-6 col-md-12" >
+        <div class="service-item position-relative">
+          <div class="icon"><i class="fas fa-syringe"></i></div>
+          <h3>Vaccinations & dépistages</h3>
+          <p>Mise à jour vaccinale, dépistages ciblés selon votre profil et votre âge.</p>
+        </div>
+      </div>
+      <div class="col-lg-6 col-md-12" >
+        <div class="service-item position-relative">
+          <div class="icon"><i class="fas fa-band-aid"></i></div>
+          <h3>Pharmacie</h3>
+          <p>Achat de médicaments.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section id="faq" class="faq section light-background">
+  <div class="container section-title" >
+    <h2>Questions fréquentes</h2>
+    <p>Informations pratiques pour préparer votre venue.</p>
+  </div>
+
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-10" >
+        <div class="faq-container">
+          <div class="faq-item faq-active">
+            <h3>Quels documents apporter ?</h3>
+            <div class="faq-content">
+              <p>Carte Vitale, pièce d’identité, liste de médicaments et comptes rendus récents.</p>
+            </div>
+            <i class="faq-toggle bi bi-chevron-right"></i>
+          </div>
+          <div class="faq-item">
+            <h3>Proposez-vous la téléconsultation ?</h3>
+            <div class="faq-content">
+              <p>Oui, vous pouvez prendre un rendez-vous en ligne ou contactez le secrétariat.</p>
+            </div>
+            <i class="faq-toggle bi bi-chevron-right"></i>
+          </div>
+          <div class="faq-item">
+            <h3>Quels sont les délais pour un rendez-vous ?</h3>
+            <div class="faq-content">
+              <p>La plupart des motifs obtiennent un créneau sous quelques jours. Urgences : appelez.</p>
+            </div>
+            <i class="faq-toggle bi bi-chevron-right"></i>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section id="contact" class="contact section">
+  <div class="container section-title">
+    <h2>L'accès au cabinet médical</h2>
+    <p>Adresse, téléphone et Plan.</p>
+  </div>
+
+  
+
+  <div class="container" >
+    <div class="row gy-4">
+      <div class="col-lg-4">
+        <div class="info-item d-flex">
+          <i class="bi bi-geo-alt flex-shrink-0"></i>
+          <div>
+            <h3>Adresse</h3>
+            <p>7, rue des archives / 53000 / Laval</p>
+          </div>
+        </div>
+
+        <div class="info-item d-flex" >
+          <i class="bi bi-telephone flex-shrink-0"></i>
+          <div>
+            <h3>Téléphone</h3>
+            <p>02 99 99 99 99</p>
+          </div>
+        </div>
+
+        <div class="info-item d-flex" >
+          <i class="bi bi-envelope flex-shrink-0"></i>
+          <div>
+            <h3>Email</h3>
+            <p>cabinetmartinoneline535gmail.com</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-8" id="gmap">
+        
+    
+    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2665.986843668288!2d-0.7633576883544411!3d48.0718968556119!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4808fdfbc1fa6b87%3A0x1cca4f4697d0baa6!2sCabinetMartinA%2C%207%20Rue%20des%20Archives%2C%2053000%20Laval!5e0!3m2!1sfr!2sfr!4v1761783470134!5m2!1sfr!2sfr" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+  
+      </div> 
+    </div>
+  </div>
+</section>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const container = document.querySelector('.faq-container') || document;
+
+  // Init accessibilité + état affiché/masqué
+  document.querySelectorAll('.faq-item').forEach(el => {
+    const h3 = el.querySelector('h3');
+    const content = el.querySelector('.faq-content');
+
+    if (h3) {
+      h3.setAttribute('role', 'button');
+      h3.setAttribute('tabindex', '0');
+      h3.setAttribute('aria-expanded', el.classList.contains('faq-active') ? 'true' : 'false');
+    }
+    if (content) {
+      content.hidden = !el.classList.contains('faq-active');
+    }
+  });
+
+  function activate(item) {
+    document.querySelectorAll('.faq-item').forEach(el => {
+      const isActive = el === item;
+      el.classList.toggle('faq-active', isActive);
+
+      const h3 = el.querySelector('h3');
+      const content = el.querySelector('.faq-content');
+      if (h3) h3.setAttribute('aria-expanded', isActive ? 'true' : 'false');
+      if (content) content.hidden = !isActive;
+    });
+  }
+
+  // Clic sur l’item (ou un enfant)
+  container.addEventListener('click', (e) => {
+    const item = e.target.closest('.faq-item');
+    if (!item) return;
+    activate(item);
+  });
+
+  // Clavier sur le titre
+  container.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    const h3 = e.target.closest('.faq-item h3');
+    if (!h3) return;
+    e.preventDefault();
+    activate(h3.closest('.faq-item'));
+  });
+});
+
+var iframe = document.getElementById('gmap');
+iframe.addEventListener('load', () => {
+    alert('ok');
+    document.querySelector('.place-name').textContent = 'Cabinet Martin';
+    
+  });
+    
+</script>
+{% endblock %}

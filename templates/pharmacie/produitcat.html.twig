@@ -1,0 +1,71 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Produits{% endblock %}
+
+{% block main %}
+<style>
+    .product-grid {
+        display: flex;
+        gap: 2em;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-top: 2em;
+    }
+    .product-card {
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        width: 280px;
+        padding: 1em;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        text-align: center;
+        background-color: #fdfdfd;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+
+    }
+    .product-card img {
+        max-width: 100%;
+        height: auto;
+        margin-bottom: 1em;
+    }
+    .product-card h3 {
+        margin-bottom: 0.5em;
+        font-size: 1.2em;
+    }
+    .product-card p {
+        margin: 0.3em 0;
+    }
+    .btn {
+        display: inline-block;
+        margin-top: 1em;
+        padding: 0.5em 1em;
+        background-color: #007bff;
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+    }
+
+</style>
+
+{# Affiche le titre et la description de la catégorie courante #}
+{% set currentCat = categories|filter(c => c.id == cat)|first %}
+<h1 style="text-align:center;">{{ currentCat.nom }}</h1>
+<h2 style="text-align:center; color: #666;">{{ currentCat.description }}</h2>
+
+<div class="product-grid">
+    {% for p in products %}
+        <div class="product-card">
+            <img src="{{ asset(p.image) }}" alt="{{ p.nom }}">
+            <h3>{{ p.nom }}</h3>
+            <p><strong>Forme :</strong> {{ p.forme }}</p>
+            <p><strong>Dosage :</strong> {{ p.dosage }}</p>
+            <p><strong>Prix :</strong> {{ p.prix }} €</p>
+            <p><strong>Disponibilité :</strong> {{ p.stock > 0 ? 'En stock' : 'Rupture' }}</p>
+            <a class="btn btn-outline-primary"href="{{ path('app_pharmacie_medicament', { cat: cat, id: p.id }) }}">Voir le détail</a>
+        </div>
+    {% else %}
+        <p style="text-align:center;">Aucun médicament disponible pour cette catégorie.</p>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ medicament.nom }}{% endblock %}
+
+{% block main %}
+<style>
+    .detail-wrapper {
+        max-width: 800px;
+        margin: 2em auto;
+        padding: 2em;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        background-color: #fdfdfd;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        font-size: 18px;
+    }
+    .detail-wrapper img {
+        max-width: 100%;
+        height: auto;
+        margin-bottom: 1em;
+    }
+    .detail-wrapper h1 {
+        margin-bottom: 0.5em;
+    }
+    .detail-wrapper p {
+        margin: 0.5em 0;
+    }
+    .quantity-select {
+        width: 60px;
+        text-align: center;
+        margin-right: 1em;
+    }
+    .btn {
+        padding: 0.5em 1em;
+        background-color: #007bff;
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+        border: none;
+        cursor: pointer;
+    }
+</style>
+
+<div class="detail-wrapper">
+    <img src="{{ asset(medicament.image) }}" alt="{{ medicament.nom }}">
+    <h1>{{ medicament.nom }}</h1>
+    <p><strong>Catégorie :</strong> {{ categories[cat-1].nom }}</p>
+    <p><strong>Forme :</strong> {{ medicament.forme }} — <strong>Dosage :</strong> {{ medicament.dosage }}</p>
+    <p><strong>Prix :</strong> {{ medicament.prix }} €</p>
+    <p>{{ medicament.description }}</p>
+
+    <form method="post" action="{{ path('app_panier_add', {id: medicament.id}) }}" method="post" class="dinline-flex gap-2">
+        <input type="number" name="quantite" value="1" min="1" class="quantity-select">
+        <button type="submit" class="btn">Ajouter au panier</button>
+    </form>
+</div>
+{% endblock %}

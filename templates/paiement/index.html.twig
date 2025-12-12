@@ -1,0 +1,86 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Paiement{% endblock %}
+
+{% block main %}
+<style>
+    .payment-container {
+        max-width: 500px;
+        margin: 3em auto;
+        padding: 2em;
+        background-color: #fdfdfd;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        font-family: sans-serif;
+    }
+    .payment-container h1 {
+        text-align: center;
+        margin-bottom: 1.5em;
+    }
+    .form-group {
+        margin-bottom: 1.2em;
+    }
+    .form-group label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 0.5em;
+    }
+    .form-group input {
+        width: 100%;
+        padding: 0.6em;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 1em;
+    }
+    .form-row {
+        display: flex;
+        gap: 1em;
+    }
+    .form-row .form-group {
+        flex: 1;
+    }
+    .btn-pay {
+        width: 100%;
+        padding: 0.8em;
+        background-color: #000;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        font-size: 1.1em;
+        cursor: pointer;
+        margin-top: 1em;
+    }
+</style>
+
+<div class="payment-container">
+    <h1>Paiement</h1>
+    <form method="post" action="{{ path('app_paiement_payer') }}">
+        <div class="form-group">
+            <label for="nom">Nom du titulaire</label>
+            <input type="text" id="nom" name="nom" placeholder="Entrez votre nom complet" required>
+        </div>
+
+        <div class="form-group">
+            <label for="numero">Numéro de carte</label>
+            <input type="text" id="numero" name="numero" placeholder="0000 0000 0000 0000" required>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="expiration">Date d’expiration</label>
+                <input type="text" id="expiration" name="expiration" placeholder="MM/AA" required>
+            </div>
+            <div class="form-group">
+                <label for="cvv">CVV</label>
+                <input type="text" id="cvv" name="cvv" placeholder="CVV" required>
+            </div>
+        </div>
+
+        <a href="{{ path('app_paiement_payer') }}">
+        <button class="checkout" style="cursor: pointer;">
+        <span>Payer</span>
+        </button>
+        </a>
+    </form>
+</div>
+{% endblock %}

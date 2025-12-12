@@ -1,0 +1,57 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nos catégories de médicaments{% endblock %}
+
+{% block main %}
+<style>
+    .category-container {
+        display: flex;
+        justify-content: center;
+        align-items: stretch;
+        gap: 2em;
+        flex-wrap: wrap;
+        margin-top: 2em;
+    }
+    .category-box {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        width: 280px;
+        padding: 1.5em;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        background-color: #fdfdfd;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        text-align: center;
+    }
+    .category-box h3 {
+        font-size: 1.3em;
+        margin-bottom: 0.5em;
+    }
+    .category-box p {
+        color: #555;
+        margin-bottom: 1em;
+    }
+    .category-box .btn {
+        margin-top: auto;
+        display: inline-block;
+        padding: 0.5em 1em;
+        background-color: #007bff;
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+    }
+</style>
+
+<h1 style="text-align:center;">Nos catégories de médicaments</h1>
+
+<div class="category-container">
+    {% for c in categories %}
+        <div class="category-box">
+            <h3>{{ c.nom }}</h3>
+            <p>{{ c.description }}</p>
+            <a class="btn" href="{{ path('app_pharmacie_cat', { cat: c.id }) }}">Voir les médicaments</a>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

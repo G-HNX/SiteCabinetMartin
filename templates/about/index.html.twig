@@ -1,0 +1,92 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}A propos du cabinet Martin!{% endblock %}
+
+{% block main %}
+<style>
+    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
+    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
+</style>
+
+<div class="example-wrapper">
+    <h1>A propos du cabinet MArtin</h1>
+
+    {# === About ============================================================== #}
+<section id="about" class="about section">
+  <div class="container">
+    <div class="row gy-4 gx-5">
+      <div class="col-lg-6" >
+        <img src="{{ asset('img/about.jpg') }}" class="img-fluid" alt="Cabinet Martin">
+      </div>
+
+      <div class="col-lg-6 content" >
+        <h3>À propos du Cabinet</h3>
+        <p>
+          Le Cabinet Martin regroupe deux médecins : le <strong>Dr Martin</strong> (médecine interne) et le <strong>Dr House</strong> (médecine générale).
+          Notre objectif : proposer un parcours de soins clair, efficace et humain, de la prévention au suivi des pathologies chroniques.
+        </p>
+        <ul>
+          <li>
+            <i class="fa-solid fa-vial-circle-check"></i>
+            <div>
+              <h5>Prise en charge globale</h5>
+              <p>De la 1ʳᵉ consultation au suivi spécialisé, nous restons votre point de contact.</p>
+            </div>
+          </li>
+          <li>
+            <i class="fa-solid fa-pump-medical"></i>
+            <div>
+              <h5>Soins du quotidien</h5>
+              <p>Consultations, renouvellements d’ordonnances, certificats, petites urgences non vitales.</p>
+            </div>
+          </li>
+          <li>
+            <i class="fa-solid fa-heart-circle-xmark"></i>
+            <div>
+              <h5>Prévention & dépistage</h5>
+              <p>Bilans, vaccinations, dépistages adaptés à votre âge et à vos facteurs de risque.</p>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+{# === Stats (peut être commenté si inutile) ============================== #}
+<section id="stats" class="stats section light-background">
+  <div class="container" >
+    <div class="row gy-4">
+      <div class="col-lg-3 col-md-6 d-flex flex-column align-items-center">
+        <i class="fa-solid fa-user-doctor"></i>
+        <div class="stats-item">
+          
+          <p>Médecins</p>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6 d-flex flex-column align-items-center">
+        <i class="fa-regular fa-hospital"></i>
+        <div class="stats-item">
+          
+          <p>Spécialités</p>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6 d-flex flex-column align-items-center">
+        <i class="fas fa-calendar-check"></i>
+        <div class="stats-item">
+          
+          <p>Créneaux/jour</p>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6 d-flex flex-column align-items-center">
+        <i class="fas fa-star"></i>
+        <div class="stats-item">
+          
+          <p>% patients satisfaits</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</div>
+{% endblock %}

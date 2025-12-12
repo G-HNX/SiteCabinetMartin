@@ -1,0 +1,12 @@
+<style>
+    .main{margin:1em auto; max-width:800px; width: 95%;font:18px/1.5 sans-serif;}
+</style>
+
+<div class="main">
+    <p>'Hello {{ name }}!<p>
+    {% for elem in tableau %}
+        {{elem}}
+    {% endfor %} 
+    {% set name='test' %}
+    <p>Hello {{ name }}!<p>
+</div>
