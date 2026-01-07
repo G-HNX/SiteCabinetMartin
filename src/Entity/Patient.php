@@ -3,8 +3,6 @@
 namespace App\Entity;
 
 use App\Repository\PatientRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: PatientRepository::class)]
@@ -15,66 +13,28 @@ class Patient
     #[ORM\Column]
     private ?int $id = null;
 
-    /**
-     * @var Collection<int, RendezVous>
-     */
-    #[ORM\OneToMany(targetEntity: RendezVous::class, mappedBy: 'Patient')]
-    private Collection $lesRendezVous;
-
-    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    #[ORM\OneToOne(inversedBy: 'patient', cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Personne $patientPersonne = null;
-
-    public function __construct()
-    {
-        $this->lesRendezVous = new ArrayCollection();       
-    }
+    private ?Personne $personne = null;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * @return Collection<int, RendezVous>
-     */
-    public function getLesRendezVous(): Collection
+    public function getPersonne(): ?Personne
     {
-        return $this->lesRendezVous;
+        return $this->personne;
     }
 
-    public function addLesRendezVou(RendezVous $lesRendezVou): static
+    public function setPersonne(?Personne $personne): self
     {
-        if (!$this->lesRendezVous->contains($lesRendezVou)) {
-            $this->lesRendezVous->add($lesRendezVou);
-            $lesRendezVou->setPatient($this);
+        $this->personne = $personne;
+
+        if ($personne && $personne->getPatient() !== $this) {
+            $personne->setPatient($this);
         }
 
         return $this;
     }
-
-    public function removeLesRendezVou(RendezVous $lesRendezVou): static
-    {
-        if ($this->LesRendezVous->removeElement($lesRendezVou)) {
-            // set the owning side to null (unless already changed)
-            if ($lesRendezVou->getPatient() === $this) {
-                $lesRendezVou->setPatient(null);
-            }
-        }
-
-        return $this;
-    }
-
-    public function getPatientPersonne(): ?Personne
-    {
-        return $this->patientPersonne;
-    }
-
-    public function setPatientPersonne(Personne $patientPersonne): static
-    {
-        $this->patientPersonne = $patientPersonne;
-
-        return $this;
-    }
-
 }

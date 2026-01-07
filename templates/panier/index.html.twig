@@ -68,19 +68,23 @@
         {% for ligne in items %}
             <div class="panier-item">
                 <img src="{{ asset(ligne.image) }}" alt="{{ ligne.nom }}">
+
                 <div class="panier-details">
                     <strong>{{ ligne.nom }}</strong>
-                    <span>Prix : {{ ligne.prix }} €</span>
-                    <span>Qté : {{ ligne.qty }}</span>
-                    <span>Total : {{ ligne.total|number_format(2, '.', ',') }} €</span>
+                    <span>Prix unitaire : {{ ligne.prix }} €</span>
+                    <span>Quantité : {{ ligne.quantite }}</span>
+                    <span>Total : {{ (ligne.prix * ligne.quantite)|number_format(2, '.', ',') }} €</span>
                 </div>
+
                 <div class="panier-actions">
                     <form action="{{ path('app_panier_decrease', {id: ligne.id}) }}" method="post">
                         <button class="btn btn-outline" type="submit">–</button>
                     </form>
+
                     <form action="{{ path('app_panier_add', {id: ligne.id}) }}" method="post">
                         <button class="btn btn-outline" type="submit">+</button>
                     </form>
+
                     <form action="{{ path('app_panier_remove', {id: ligne.id}) }}" method="post">
                         <button class="btn btn-danger" type="submit">Supprimer</button>
                     </form>
@@ -93,11 +97,12 @@
         </div>
 
         <div class="panier-footer">
-            <a class="btn btn-outline-secondary" href="{{ path('app_panier_clear') }}">
-            Vider le panier
+            <a class="btn btn-outline" href="{{ path('app_panier_clear') }}">
+                Vider le panier
             </a>
-            <a href="{{ path('app_paiement') }}" >
-            <button class="btn btn-primary" type="submit">Effectuer le paiement</button>
+
+            <a href="{{ path('app_paiement') }}">
+                <button class="btn btn-primary" type="button">Effectuer le paiement</button>
             </a>
         </div>
     {% endif %}

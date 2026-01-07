@@ -42,14 +42,14 @@
 </style>
 
 <div class="detail-wrapper">
-    <img src="{{ asset(medicament.image) }}" alt="{{ medicament.nom }}">
-    <h1>{{ medicament.nom }}</h1>
+    <img src="{{ asset(product.image) }}" alt="{{ product.nom }}">
+    <h1>{{ product.nom }}</h1>
     <p><strong>Catégorie :</strong> {{ categories[cat-1].nom }}</p>
-    <p><strong>Forme :</strong> {{ medicament.forme }} — <strong>Dosage :</strong> {{ medicament.dosage }}</p>
-    <p><strong>Prix :</strong> {{ medicament.prix }} €</p>
-    <p>{{ medicament.description }}</p>
+    <p><strong>Forme :</strong> {{ product.forme }} — <strong>Dosage :</strong> {{ product.dosage }}</p>
+    <p><strong>Prix :</strong> {{ product.prix }} €</p>
+    <p>{{ product.description }}</p>
 
-    <form method="post" action="{{ path('app_panier_add', {id: medicament.id}) }}" method="post" class="dinline-flex gap-2">
+    <form method="post" action="{{ path('app_panier_add', {id: product.id}) }}" method="post" class="dinline-flex gap-2">
         <input type="number" name="quantite" value="1" min="1" class="quantity-select">
         <button type="submit" class="btn">Ajouter au panier</button>
     </form>

@@ -1,28 +1,37 @@
 <?php
-namespace App\EventSubscriber;
+namespace App\Service;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Twig\Environment;
 
-final class GlobalCartSubscriber implements EventSubscriberInterface
+final class TwigPanierSubscriber implements EventSubscriberInterface
 {
-    public function __construct(
-        private SessionInterface $session,
-        private Environment $twig
-    ) {}
+    private RequestStack $requestStack;
+    private Environment $twig;
+
+    public function __construct(RequestStack $requestStack, Environment $twig)
+    {
+        $this->requestStack = $requestStack;
+        $this->twig = $twig;
+    }
 
     public function onKernelController(ControllerEvent $event): void
     {
-        if (!$event->isMainRequest()) return;
+        if (!$event->isMainRequest()) {
+            return;
+        }
 
-        // Lecture directe du panier en session
-        $cart = $this->session->get('cart', []);
+        $session = $this->requestStack->getSession();
+        if ($session) {
+            // Lecture directe du panier en session
+            $panier = $session->get('panier', []);
 
-        // Injection dans Twig comme variable globale
-        $this->twig->addGlobal('global_cart', $cart);
+            // Injection dans Twig comme variable globale
+            $this->twig->addGlobal('global_panier', $panier);
+        }
     }
 
     public static function getSubscribedEvents(): array

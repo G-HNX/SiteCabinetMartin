@@ -2,7 +2,10 @@
 
 namespace App\Controller;
 
+use App\Entity\Categorie;
+use App\Entity\Medicament;
 use App\Service\PanierService;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -11,44 +14,92 @@ use Symfony\Component\Routing\Annotation\Route;
 final class PanierController extends AbstractController
 {
     /** @var array<int, array<string, mixed>> */
-    private array $categories = [
-        ['id' => 1, 'nom' => 'Antibiotiques', 'description' => 'Contre les infections bactériennes.'],
-        ['id' => 2, 'nom' => 'Antalgiques', 'description' => 'Réduisent la douleur.'],
-        ['id' => 3, 'nom' => 'Anti-inflammatoires', 'description' => 'Réduisent inflammation et douleur.'],
-    ];
+    private array $categories = [];
 
     /** @var array<int, array<string, mixed>> */
-    private array $medicaments = [
-        // Cat. 1
-        ['id'=>101,'nom'=>'Amoxicilline','forme'=>'Gélule','dosage'=>'500 mg','prix'=>4.50,'description'=>'Lorem ipsum...','image'=>'img/meds/amoxicilline.jpg','stock'=>12,'cat_id'=>1],
-        ['id'=>102,'nom'=>'Clarithromycine','forme'=>'Comprimé','dosage'=>'250 mg','prix'=>7.90,'description'=>'Lorem ipsum...','image'=>'img/meds/clarithromycine.jpg','stock'=>5,'cat_id'=>1],
-        // Cat. 2
-        ['id'=>201,'nom'=>'Paracétamol','forme'=>'Comprimé','dosage'=>'500 mg','prix'=>2.10,'description'=>'Lorem ipsum...','image'=>'img/meds/paracetamol.jpg','stock'=>0,'cat_id'=>2],
-        ['id'=>202,'nom'=>'Codéine','forme'=>'Comprimé','dosage'=>'30 mg','prix'=>5.60,'description'=>'Lorem ipsum...','image'=>'img/meds/codeine.jpg','stock'=>8,'cat_id'=>2],
-        // Cat. 3
-        ['id'=>301,'nom'=>'Ibuprofène','forme'=>'Comprimé','dosage'=>'400 mg','prix'=>3.20,'description'=>'Lorem ipsum...','image'=>'img/meds/ibuprofene.jpg','stock'=>15,'cat_id'=>3],
-        ['id'=>302,'nom'=>'Naproxène','forme'=>'Comprimé','dosage'=>'500 mg','prix'=>6.30,'description'=>'Lorem ipsum...','image'=>'img/meds/naproxene.jpg','stock'=>3,'cat_id'=>3],
-    ];
+    private array $medicaments = [];
 
+    public function __construct(EntityManagerInterface $entityManager)
+    {
+        // Charger tous les médicaments depuis la base
+        $medicaments = $entityManager->getRepository(Medicament::class)->findAll();
+        foreach ($medicaments as $medicament) {
+            $this->medicaments[] = $this->transformObjetTableau($medicament);
+        }
+
+        // Charger toutes les catégories depuis la base
+        $categories = $entityManager->getRepository(Categorie::class)->findAll();
+        foreach ($categories as $categorie) {
+            $this->categories[] = $this->transformObjetTableau($categorie);
+        }
+    }
+
+    /**
+     * Transforme un objet Doctrine en tableau compatible avec le PanierService
+     */
+    public function transformObjetTableau($objet): ?array
+    {
+        if (!$objet) {
+            return null;
+        }
+
+        if ($objet instanceof Medicament) {
+            return [
+                'id' => $objet->getId(),
+                'nom' => $objet->getNom(),
+                'forme' => $objet->getForme(),
+                'dosage' => $objet->getDosage(),
+                'prix' => $objet->getPrix(),
+                'description' => $objet->getDescription(),
+                'image' => $objet->getImage(),
+                'stock' => $objet->getStock(),
+                'cat_id' => $objet->getCategorie()->getId(),
+            ];
+        }
+
+        if ($objet instanceof Categorie) {
+            return [
+                'id' => $objet->getId(),
+                'nom' => $objet->getNom(),
+                'description' => $objet->getDescription(),
+            ];
+        }
+
+        return null;
+    }
+
+    /**
+     * Trouver un médicament dans le tableau transformé
+     */
     public function findOne(int $id): ?array
     {
         foreach ($this->medicaments as $m) {
-            if ($m['id'] === $id) return $m;
+            if ($m['id'] === $id) {
+                return $m;
+            }
         }
         return null;
     }
 
-    #[Route('/panier', name: 'app_panier', methods: ['GET'])]
+    #[Route('/panier', name: 'app_panier')]
     public function index(PanierService $cart): Response
     {
-        $data = $cart->detailed($this->medicaments);
-        return $this->render('panier/index.html.twig', $data);
+        $items = $cart->detailed();  
+        $total = 0;
+
+        foreach ($items as $item) {
+            $total += $item['prix'] * $item['quantite'];
+        }
+
+        return $this->render('panier/index.html.twig', [
+            'items' => $items,   
+            'total' => $total
+        ]);
     }
 
     #[Route('/panier/ajouter/{id}', name: 'app_panier_add', requirements: ['id' => '\d+'], methods: ['POST','GET'])]
-    public function add(int $id, Request $request, PanierService $cart): Response
+    public function add(int $id, PanierService $cart): Response
     {
-        // Ajoute ou incrémente la quantité
         $cart->add($id);
         return $this->redirectToRoute('app_panier');
     }
@@ -56,7 +107,6 @@ final class PanierController extends AbstractController
     #[Route('/panier/diminuer/{id}', name: 'app_panier_decrease', requirements: ['id' => '\d+'], methods: ['POST','GET'])]
     public function decrease(int $id, PanierService $cart): Response
     {
-        // Diminue la quantité de 1
         $cart->decrease($id);
         return $this->redirectToRoute('app_panier');
     }
@@ -64,7 +114,6 @@ final class PanierController extends AbstractController
     #[Route('/panier/retirer/{id}', name: 'app_panier_remove', requirements: ['id' => '\d+'], methods: ['POST','GET'])]
     public function remove(int $id, PanierService $cart): Response
     {
-        // Supprime complètement l’élément
         $cart->remove($id);
         return $this->redirectToRoute('app_panier');
     }
@@ -72,7 +121,6 @@ final class PanierController extends AbstractController
     #[Route('/panier/vider', name: 'app_panier_clear', methods: ['POST','GET'])]
     public function clear(PanierService $cart): Response
     {
-        // Vide le panier
         $cart->clear();
         return $this->redirectToRoute('app_panier');
     }

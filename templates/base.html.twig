@@ -69,7 +69,6 @@
                         <li><a href="{{path('app_home')}}" class="active">Accueil<br></a></li>
                         <li><a href="{{path('app_about')}}">About</a></li>
                         <li><a href="{{path('app_pharmacie')}}">Pharmacie</a></li>
-                        <li><a href="#departments">Connexion</a></li>
                         <li><a href="{{path('app_medecin')}}">Médecins</a></li>
                         <li><a href="{{path('app_panier')}}">Panier</a></li>  
                         <div class="cart-icon">
@@ -78,7 +77,14 @@
                             <span class="cart-badge">{{ app.request.session.get('count') }}</span>
                           {% endif %}
                         </div>
-                        <li><a href="#contact">Contact</a></li>
+                        <li><a href="{{ path('app_contact') }}">Contact</a></li>
+                        {% set current = app.request.attributes.get('_route') %}
+                        {% if app.user %} 
+                        <li><a href="{{ url('app_profil') }}" class="{{ current == 'app_profil' ? 'active' : '' }}">Profil</a></li>
+                        <li><a href="{{ url('app_logout') }}" class="{{ current == 'app_logout' ? 'active' : '' }}">Déconnexion</a></li> 
+                        {% else %} 
+                        <li><a href="{{ url('app_login') }}" class="{{ current == 'app_login' ? 'active' : '' }}">Connexion</a></li> 
+                        {% endif %}
                     </ul>
                     <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
                     </nav>
@@ -131,8 +137,8 @@
             </div>
             <div class="col-lg-2 col-md-4 footer-links">                
                 <ul>
-                    <li><a href="#">Connexion</a></li>
-                    <li><a href="#">Contact</a></li>
+                    <li><a href="{{ path('app_login') }}">Connexion</a></li>
+                    <li><a href="{{ path('app_contact') }}">Contact</a></li>
                 </ul>
             </div>
 

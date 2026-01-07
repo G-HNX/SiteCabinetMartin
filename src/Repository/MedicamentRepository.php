@@ -40,4 +40,30 @@ class MedicamentRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+    public function findAll(): array
+    {
+        return $this->createQueryBuilder('m')
+            ->orderBy('m.nom', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findByCategorie($value): array
+    {
+        return $this->createQueryBuilder('m')
+            ->andWhere('m.categorie = :val')
+            ->setParameter('val', $value)
+            ->orderBy('m.nom', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findOneMedicament($value): ?Medicament
+    {
+        return $this->createQueryBuilder('m')
+            ->andWhere('m.id = :val')
+            ->setParameter('val', $value)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 }
