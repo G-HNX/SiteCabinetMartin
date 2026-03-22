@@ -88,6 +88,47 @@
       font-size: .85rem;
       opacity: .7;
     }
+
+    /* ── Séparateur vertical entre nav et compte ── */
+    #navmenu ul li.nav-sep {
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+      pointer-events: none;
+    }
+    #navmenu ul li.nav-sep::after {
+      content: '';
+      display: block;
+      width: 1px;
+      height: 20px;
+      background: #d0d8e4;
+    }
+
+    /* ── Encadré compte ── */
+    #navmenu ul li.nav-account > a {
+      border: 1.5px solid #b0bece !important;
+      border-radius: 8px !important;
+      padding: 5px 14px !important;
+      margin-left: 4px;
+      transition: background .2s, border-color .2s, color .2s !important;
+    }
+    #navmenu ul li.nav-account > a:hover,
+    #navmenu ul li.nav-account > a.active {
+      background: #f0f5fb !important;
+      border-color: #2aa4b5 !important;
+      color: #2aa4b5 !important;
+    }
+
+    /* Mobile : on retire l'encadré */
+    @media (max-width: 1199px) {
+      #navmenu ul li.nav-sep { display: none !important; }
+      #navmenu ul li.nav-account > a {
+        border: none !important;
+        border-radius: 0 !important;
+        margin-left: 0;
+        padding: 10px 20px !important;
+      }
+    }
   </style>
 
   <!-- =======================================================
@@ -197,9 +238,12 @@
                                 <a href="{{ path('app_contact') }}" class="{{ current == 'app_contact' ? 'active' : '' }}">Contact</a>
                             </li>
 
+                            <!-- Séparateur -->
+                            <li class="nav-sep d-none d-xl-flex"></li>
+
                             <!-- Mon compte -->
                             {% if app.user %}
-                                <li class="dropdown">
+                                <li class="dropdown nav-account">
                                     <a href="#" class="{{ compteActive ? 'active' : '' }}">
                                         <span class="nav-user-chip">
                                             <i class="bi bi-person-circle"></i>
@@ -232,8 +276,10 @@
                                     </ul>
                                 </li>
                             {% else %}
-                                <li>
-                                    <a href="{{ path('app_login') }}" class="{{ current == 'app_login' ? 'active' : '' }}">Connexion</a>
+                                <li class="nav-account">
+                                    <a href="{{ path('app_login') }}" class="{{ current == 'app_login' ? 'active' : '' }}">
+                                        <i class="bi bi-person me-1"></i>Connexion
+                                    </a>
                                 </li>
                             {% endif %}
 
