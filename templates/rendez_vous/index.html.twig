@@ -1,84 +1,69 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Disponibilités - Cabinet Martin{% endblock %}
+{% block title %}Prendre un rendez-vous — Cabinet Martin{% endblock %}
 
 {% block main %}
-  <style>
-    .example-wrapper {
-      margin: 1em auto;
-      max-width: 800px;
-      width: 95%;
-      font: 18px/1.5 sans-serif;
-    }
+<section class="section">
+  <div class="container-fluid px-4" data-aos="fade-up">
 
-    .example-wrapper code {
-      background: #F5F5F5;
-      padding: 2px 6px;
-    }
+    <div class="section-title">
+      <h2>Prendre un rendez-vous</h2>
+      <p>Selectionnez un creneau disponible</p>
+    </div>
 
-    .availability-table .btn {
-      min-width: 64px;
-    }
-  </style>
+    {% for label, messages in app.flashes %}
+      {% for m in messages %}
+        <div class="alert alert-{{ label == 'success' ? 'success' : (label == 'error' ? 'danger' : 'info') }} alert-dismissible fade show">
+          {{ m }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      {% endfor %}
+    {% endfor %}
 
-  <div class="example-wrapper">
-    <h1>Les disponibilités</h1>
+    {% if doctors is empty %}
+      <div class="text-center py-5">
+        <i class="bi bi-person-x text-muted" style="font-size: 5rem;"></i>
+        <h4 class="mt-3 text-muted">Aucun medecin disponible pour le moment</h4>
+      </div>
+    {% else %}
 
-    <div class="container py-4">
+      {# Navigation #}
       <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
-        <h1 class="h4 m-0">Disponibilités (jours ouvrés)</h1>
-
-        <div class="d-flex gap-2 mb-3">
-          {# Reculer d’un jour (jamais < aujourd’hui) #}
-          <a
-            class="btn btn-outline-secondary {{ offset == 0 ? 'disabled' : '' }}"
-            href="{{ path('app_rendez_vous', { mode: 'move', day: -1 }) }}"
-            aria-disabled="{{ offset == 0 ? 'true' : 'false' }}"
-          >← Jour précédent</a>
-
-          {# Avancer d’un jour (indéfiniment) #}
-          <a
-            class="btn btn-outline-secondary"
-            href="{{ path('app_rendez_vous', { mode: 'move', day: 1 }) }}"
-          >Jour suivant →</a>
-
-          {# Aller directement à aujourd’hui #}
-          <a
-            class="btn btn-outline-primary"
-            href="{{ path('app_rendez_vous', { mode: 'reset', day: 0 }) }}"
-          >Aujourd’hui</a>
+        <div class="d-flex gap-2">
+          <a class="btn btn-outline-secondary {{ offset == 0 ? 'disabled' : '' }}"
+            href="{{ path('app_rendez_vous', { mode: 'move', day: -1 }) }}">
+            <i class="bi bi-chevron-left me-1"></i>Jour precedent
+          </a>
+          <a class="btn btn-outline-primary"
+            href="{{ path('app_rendez_vous', { mode: 'reset', day: 0 }) }}">
+            <i class="bi bi-calendar-today me-1"></i>Aujourd'hui
+          </a>
+          <a class="btn btn-outline-secondary"
+            href="{{ path('app_rendez_vous', { mode: 'move', day: 1 }) }}">
+            Jour suivant<i class="bi bi-chevron-right ms-1"></i>
+          </a>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+          {% for d in doctors %}
+            <span class="badge bg-primary py-2 px-3">
+              <i class="bi bi-person-badge me-1"></i>{{ d.name }} — {{ d.speciality }}
+            </span>
+          {% endfor %}
         </div>
       </div>
 
-      {# Légende médecins #}
-      <div class="mb-3">
-        <strong>Médecins :</strong>
-        {% for d in doctors %}
-          <span class="badge bg-secondary me-2">{{ d.name }} — {{ d.speciality }}</span>
-        {% endfor %}
-      </div>
+      {# Tableau #}
+      {% set jours = { 1: 'Lundi', 2: 'Mardi', 3: 'Mercredi', 4: 'Jeudi', 5: 'Vendredi', 6: 'Samedi', 7: 'Dimanche' } %}
 
-      {# Tableau des disponibilités #}
       <div class="table-responsive">
-        <table class="table table-bordered align-middle availability-table">
-          <thead class="table-light">
+        <table class="table table-bordered align-top">
+          <thead class="table-primary">
             <tr>
-              <th style="width: 220px">Médecin</th>
-              {% set jours = {
-                1: 'lundi',
-                2: 'mardi',
-                3: 'mercredi',
-                4: 'jeudi',
-                5: 'vendredi',
-                6: 'samedi',
-                7: 'dimanche'
-              } %}
-
+              <th style="min-width:160px;">Medecin</th>
               {% for ymd, col in calendar %}
-                {# ymd est une string 'YYYY-MM-DD' => Twig sait la parser #}
                 {% set w = ymd|date('N', 'Europe/Paris') %}
-                <th class="text-center">
-                  {{ jours[w] | capitalize }} {{ ymd|date('d M', 'Europe/Paris') }}
+                <th class="text-center" style="min-width:120px;">
+                  <div class="fw-bold">{{ jours[w] }}</div>
+                  <div class="small text-white-50">{{ ymd|date('d/m', 'Europe/Paris') }}</div>
                 </th>
               {% endfor %}
             </tr>
@@ -86,34 +71,30 @@
           <tbody>
             {% for d in doctors %}
               <tr>
-                <th>
-                  {{ d.name }}
-                  <small class="text-muted">({{ d.speciality }})</small>
-                </th>
+                <td class="align-middle">
+                  <div class="fw-bold"><i class="bi bi-person-badge me-1 text-primary"></i>{{ d.name }}</div>
+                  <small class="text-muted">{{ d.speciality }}</small>
+                </td>
 
                 {% for ymd, col in calendar %}
                   {% set slots = col.slots[d.id] ?? [] %}
-                  <td>
-                    <div class="d-flex flex-wrap gap-2">
-                      {% for s in slots %}
-                        {% if s.available %}
-                          <a
-                            class="btn btn-sm btn-outline-primary"
-                            href="{{ path('reservation_new', {'doctor': d.id, 'slot': s.iso}) }}"
-                          >
-                            {{ s.time }}
-                          </a>
-                        {% else %}
-                          <span class="btn btn-sm btn-outline-secondary disabled" aria-disabled="true">
-                            {{ s.time }}
-                          </span>
-                        {% endif %}
-                      {% endfor %}
-
-                      {% if slots is empty %}
-                        <span class="text-muted">Fermé</span>
-                      {% endif %}
-                    </div>
+                  <td class="p-2">
+                    {% if slots is empty %}
+                      <span class="text-muted small">Ferme</span>
+                    {% else %}
+                      <div class="d-flex flex-wrap gap-1">
+                        {% for s in slots %}
+                          {% if s.available %}
+                            <a class="btn btn-sm btn-outline-success"
+                              href="{{ path('reservation_new', {'doctor': d.id, 'slot': s.iso}) }}"
+                              title="Disponible">{{ s.time }}</a>
+                          {% else %}
+                            <span class="btn btn-sm btn-outline-secondary disabled"
+                              aria-disabled="true" title="Indisponible">{{ s.time }}</span>
+                          {% endif %}
+                        {% endfor %}
+                      </div>
+                    {% endif %}
                   </td>
                 {% endfor %}
               </tr>
@@ -121,6 +102,13 @@
           </tbody>
         </table>
       </div>
-    </div>
+
+      <div class="d-flex gap-3 mt-2 small text-muted">
+        <span><span class="badge bg-outline border border-success text-success">09:00</span> Creneau disponible</span>
+        <span><span class="badge bg-outline border border-secondary text-secondary">09:30</span> Creneau indisponible</span>
+      </div>
+
+    {% endif %}
   </div>
+</section>
 {% endblock %}

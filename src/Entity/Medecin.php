@@ -24,7 +24,7 @@ class Medecin
     /**
      * @var Collection<int, RendezVous>
      */
-    #[ORM\OneToMany(targetEntity: RendezVous::class, mappedBy: 'Medecin')]
+    #[ORM\OneToMany(targetEntity: RendezVous::class, mappedBy: 'medecin')]
     private Collection $lesRendezVous;
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]

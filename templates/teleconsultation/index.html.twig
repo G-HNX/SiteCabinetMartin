@@ -1,20 +1,63 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello TeleconsultationController!{% endblock %}
+{% block title %}Teleconsultation — Cabinet Martin{% endblock %}
 
-{% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+{% block main %}
+<section class="section">
+  <div class="container" data-aos="fade-up">
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
+    <div class="section-title">
+      <h2>Teleconsultation</h2>
+      <p>Consultez un medecin depuis chez vous</p>
+    </div>
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>C:/wamp64/www/my_project/src/Controller/TeleconsultationController.php</code></li>
-        <li>Your template at <code>C:/wamp64/www/my_project/templates/teleconsultation/index.html.twig</code></li>
-    </ul>
-</div>
+    <div class="row justify-content-center">
+      <div class="col-lg-8 text-center">
+
+        <div class="card border-0 shadow-sm p-5 mb-5">
+          <i class="bi bi-camera-video-fill text-primary mb-4" style="font-size: 5rem;"></i>
+          <h3 class="fw-bold mb-3">Bientot disponible</h3>
+          <p class="text-muted mb-4">
+            La teleconsultation video avec nos medecins sera disponible prochainement.
+            En attendant, vous pouvez prendre un rendez-vous en cabinet.
+          </p>
+          <div class="d-flex justify-content-center gap-3 flex-wrap">
+            <a href="{{ path('app_rendez_vous') }}" class="btn btn-primary btn-lg">
+              <i class="bi bi-calendar-plus me-2"></i>Prendre un RDV en cabinet
+            </a>
+            <a href="{{ path('app_contact') }}" class="btn btn-outline-primary btn-lg">
+              <i class="bi bi-envelope me-2"></i>Nous contacter
+            </a>
+          </div>
+        </div>
+
+        <div class="row g-4">
+          <div class="col-md-4">
+            <div class="card border-0 shadow-sm p-4 text-center h-100">
+              <i class="bi bi-house-heart text-primary fs-1 mb-3"></i>
+              <h5 class="fw-bold">Depuis chez vous</h5>
+              <p class="text-muted small mb-0">Consultez sans vous deplacer depuis votre ordinateur ou smartphone.</p>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card border-0 shadow-sm p-4 text-center h-100">
+              <i class="bi bi-clock-history text-primary fs-1 mb-3"></i>
+              <h5 class="fw-bold">Disponible 7j/7</h5>
+              <p class="text-muted small mb-0">Des plages horaires etendues pour vous accommoder a tout moment.</p>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card border-0 shadow-sm p-4 text-center h-100">
+              <i class="bi bi-shield-check text-primary fs-1 mb-3"></i>
+              <h5 class="fw-bold">Securise</h5>
+              <p class="text-muted small mb-0">Connexion chiffree et confidentialite medicale garanties.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</section>
 {% endblock %}

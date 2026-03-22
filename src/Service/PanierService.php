@@ -3,11 +3,16 @@
 namespace App\Service;
 
 use App\Entity\Medicament;
+use App\Entity\PanierItem;
+use App\Entity\User;
+use App\Repository\PanierItemRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
 
 final class PanierService implements EventSubscriberInterface
 {
@@ -15,112 +20,224 @@ final class PanierService implements EventSubscriberInterface
 
     public function __construct(
         private RequestStack $requestStack,
-        private EntityManagerInterface $entityManager
+        private EntityManagerInterface $entityManager,
+        private PanierItemRepository $panierItemRepository,
+        private TokenStorageInterface $tokenStorage,
     ) {}
 
     public static function getSubscribedEvents(): array
     {
         return [
             KernelEvents::REQUEST => 'onRequest',
+            LoginSuccessEvent::class => 'onLoginSuccess',
         ];
     }
 
-    public function onRequest(RequestEvent $event): void
+    // -------------------------------------------------
+    // Utilisateur courant (null si non connecte)
+    // -------------------------------------------------
+    private function getUser(): ?User
     {
-        $request = $event->getRequest();
-        $session = $request->getSession();
-        $items = $this->getPanier();
-        $count = 0;
-
-        foreach ($items as $qty) {
-            $count += (int)$qty;
+        $token = $this->tokenStorage->getToken();
+        if (!$token) {
+            return null;
         }
-
-        $session->set('count', $count);
+        $user = $token->getUser();
+        return $user instanceof User ? $user : null;
     }
 
-    // -----------------------------
-    // Récupérer le panier
-    // -----------------------------
+    // -------------------------------------------------
+    // Mise a jour du compteur de session a chaque requete
+    // -------------------------------------------------
+    public function onRequest(RequestEvent $event): void
+    {
+        if (!$event->isMainRequest()) {
+            return;
+        }
+
+        $count = 0;
+        foreach ($this->getPanier() as $qty) {
+            $count += (int) $qty;
+        }
+
+        $event->getRequest()->getSession()->set('count', $count);
+    }
+
+    // -------------------------------------------------
+    // Fusion session -> BD a la connexion
+    // -------------------------------------------------
+    public function onLoginSuccess(LoginSuccessEvent $event): void
+    {
+        $user = $event->getUser();
+        if (!$user instanceof User) {
+            return;
+        }
+
+        $session = $this->requestStack->getSession();
+        $sessionItems = $session->get(self::KEY, []);
+
+        foreach ($sessionItems as $id => $qty) {
+            $medicament = $this->entityManager->getRepository(Medicament::class)->find($id);
+            if (!$medicament) {
+                continue;
+            }
+            $item = $this->panierItemRepository->findOneBy(['user' => $user, 'medicament' => $medicament]);
+            if ($item) {
+                $item->setQuantite($item->getQuantite() + $qty);
+            } else {
+                $item = new PanierItem();
+                $item->setUser($user);
+                $item->setMedicament($medicament);
+                $item->setQuantite($qty);
+                $this->entityManager->persist($item);
+            }
+        }
+
+        $this->entityManager->flush();
+        $session->remove(self::KEY);
+    }
+
+    // -------------------------------------------------
+    // Recuperer le panier sous forme [id => quantite]
+    // -------------------------------------------------
     public function getPanier(): array
     {
+        $user = $this->getUser();
+        if ($user) {
+            $items = [];
+            foreach ($this->panierItemRepository->findBy(['user' => $user]) as $item) {
+                $items[$item->getMedicament()->getId()] = $item->getQuantite();
+            }
+            return $items;
+        }
+
         return $this->requestStack->getSession()->get(self::KEY, []);
     }
 
-    private function save(array $items): void
+    // -------------------------------------------------
+    // Ajouter un produit
+    // -------------------------------------------------
+    public function add(int $id, int $qty = 1): void
     {
+        $user = $this->getUser();
+        if ($user) {
+            $medicament = $this->entityManager->getRepository(Medicament::class)->find($id);
+            if (!$medicament) {
+                return;
+            }
+            $item = $this->panierItemRepository->findOneBy(['user' => $user, 'medicament' => $medicament]);
+            if ($item) {
+                $item->setQuantite($item->getQuantite() + max(1, $qty));
+            } else {
+                $item = new PanierItem();
+                $item->setUser($user);
+                $item->setMedicament($medicament);
+                $item->setQuantite(max(1, $qty));
+                $this->entityManager->persist($item);
+            }
+            $this->entityManager->flush();
+            return;
+        }
+
+        $items = $this->requestStack->getSession()->get(self::KEY, []);
+        $items[$id] = ($items[$id] ?? 0) + max(1, $qty);
         $this->requestStack->getSession()->set(self::KEY, $items);
     }
 
-    // -----------------------------
-    // Ajouter un produit
-    // -----------------------------
-    public function add(int $id, int $qty = 1): void
-    {
-        $items = $this->getPanier();
-        $items[$id] = ($items[$id] ?? 0) + max(1, $qty);
-        $this->save($items);
-    }
-
-    // -----------------------------
-    // Diminuer la quantité
-    // -----------------------------
+    // -------------------------------------------------
+    // Diminuer la quantite
+    // -------------------------------------------------
     public function decrease(int $id, int $step = 1): void
     {
-        $items = $this->getPanier();
+        $user = $this->getUser();
+        if ($user) {
+            $medicament = $this->entityManager->getRepository(Medicament::class)->find($id);
+            if (!$medicament) {
+                return;
+            }
+            $item = $this->panierItemRepository->findOneBy(['user' => $user, 'medicament' => $medicament]);
+            if ($item) {
+                $newQty = $item->getQuantite() - $step;
+                if ($newQty <= 0) {
+                    $this->entityManager->remove($item);
+                } else {
+                    $item->setQuantite($newQty);
+                }
+                $this->entityManager->flush();
+            }
+            return;
+        }
 
+        $items = $this->requestStack->getSession()->get(self::KEY, []);
         if (isset($items[$id])) {
             $items[$id] -= $step;
-
             if ($items[$id] <= 0) {
                 unset($items[$id]);
             }
-
-            $this->save($items);
+            $this->requestStack->getSession()->set(self::KEY, $items);
         }
     }
 
-    // -----------------------------
+    // -------------------------------------------------
     // Supprimer un produit
-    // -----------------------------
+    // -------------------------------------------------
     public function remove(int $id): void
     {
-        $items = $this->getPanier();
+        $user = $this->getUser();
+        if ($user) {
+            $medicament = $this->entityManager->getRepository(Medicament::class)->find($id);
+            if (!$medicament) {
+                return;
+            }
+            $item = $this->panierItemRepository->findOneBy(['user' => $user, 'medicament' => $medicament]);
+            if ($item) {
+                $this->entityManager->remove($item);
+                $this->entityManager->flush();
+            }
+            return;
+        }
+
+        $items = $this->requestStack->getSession()->get(self::KEY, []);
         unset($items[$id]);
-        $this->save($items);
+        $this->requestStack->getSession()->set(self::KEY, $items);
     }
 
-    // -----------------------------
+    // -------------------------------------------------
     // Vider le panier
-    // -----------------------------
+    // -------------------------------------------------
     public function clear(): void
     {
-        $this->save([]);
+        $user = $this->getUser();
+        if ($user) {
+            foreach ($this->panierItemRepository->findBy(['user' => $user]) as $item) {
+                $this->entityManager->remove($item);
+            }
+            $this->entityManager->flush();
+            return;
+        }
+
+        $this->requestStack->getSession()->set(self::KEY, []);
     }
 
-    // -----------------------------
-    // Détails du panier (Doctrine)
-    // -----------------------------
+    // -------------------------------------------------
+    // Details du panier (pour les templates)
+    // -------------------------------------------------
     public function detailed(): array
     {
-        $panier = $this->getPanier();
         $result = [];
-
-        foreach ($panier as $id => $quantite) {
+        foreach ($this->getPanier() as $id => $quantite) {
             $medicament = $this->entityManager->getRepository(Medicament::class)->find($id);
-
             if ($medicament) {
                 $result[] = [
-                    'id' => $id,
-                    'nom' => $medicament->getNom(),
-                    'prix' => $medicament->getPrix(),
+                    'id'       => $id,
+                    'nom'      => $medicament->getNom(),
+                    'prix'     => $medicament->getPrix(),
                     'quantite' => $quantite,
-                    'image' => $medicament->getImage(),
-                    'stock' => $medicament->getStock(),
+                    'image'    => $medicament->getImage(),
+                    'stock'    => $medicament->getStock(),
                 ];
             }
         }
-
         return $result;
     }
 }

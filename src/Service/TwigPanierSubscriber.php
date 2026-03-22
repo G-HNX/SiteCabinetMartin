@@ -27,7 +27,7 @@ final class TwigPanierSubscriber implements EventSubscriberInterface
         $session = $this->requestStack->getSession();
         if ($session) {
             // Lecture directe du panier en session
-            $panier = $session->get('panier', []);
+            $panier = $session->get('cart_items', []);
 
             // Injection dans Twig comme variable globale
             $this->twig->addGlobal('global_panier', $panier);

@@ -1,57 +1,94 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ medicament.nom }}{% endblock %}
+{% block title %}{{ product.nom }} — Pharmacie Cabinet Martin{% endblock %}
 
 {% block main %}
-<style>
-    .detail-wrapper {
-        max-width: 800px;
-        margin: 2em auto;
-        padding: 2em;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        background-color: #fdfdfd;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        font-size: 18px;
-    }
-    .detail-wrapper img {
-        max-width: 100%;
-        height: auto;
-        margin-bottom: 1em;
-    }
-    .detail-wrapper h1 {
-        margin-bottom: 0.5em;
-    }
-    .detail-wrapper p {
-        margin: 0.5em 0;
-    }
-    .quantity-select {
-        width: 60px;
-        text-align: center;
-        margin-right: 1em;
-    }
-    .btn {
-        padding: 0.5em 1em;
-        background-color: #007bff;
-        color: white;
-        text-decoration: none;
-        border-radius: 4px;
-        border: none;
-        cursor: pointer;
-    }
-</style>
+<section class="section">
+  <div class="container" data-aos="fade-up">
 
-<div class="detail-wrapper">
-    <img src="{{ asset(product.image) }}" alt="{{ product.nom }}">
-    <h1>{{ product.nom }}</h1>
-    <p><strong>Catégorie :</strong> {{ categories[cat-1].nom }}</p>
-    <p><strong>Forme :</strong> {{ product.forme }} — <strong>Dosage :</strong> {{ product.dosage }}</p>
-    <p><strong>Prix :</strong> {{ product.prix }} €</p>
-    <p>{{ product.description }}</p>
+    <nav aria-label="breadcrumb" class="mb-4">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ path('app_pharmacie') }}">Pharmacie</a></li>
+        <li class="breadcrumb-item">
+          <a href="{{ path('app_pharmacie_cat', {cat: cat}) }}">{{ categories[cat-1].nom }}</a>
+        </li>
+        <li class="breadcrumb-item active">{{ product.nom }}</li>
+      </ol>
+    </nav>
 
-    <form method="post" action="{{ path('app_panier_add', {id: product.id}) }}" method="post" class="dinline-flex gap-2">
-        <input type="number" name="quantite" value="1" min="1" class="quantity-select">
-        <button type="submit" class="btn">Ajouter au panier</button>
-    </form>
-</div>
+    {% for label, messages in app.flashes %}
+      {% for m in messages %}
+        <div class="alert alert-{{ label == 'success' ? 'success' : (label == 'error' ? 'danger' : 'info') }} alert-dismissible fade show">
+          {{ m }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      {% endfor %}
+    {% endfor %}
+
+    <div class="row g-5">
+
+      <div class="col-md-5 text-center">
+        <img src="{{ asset(product.image) }}" alt="{{ product.nom }}"
+          class="img-fluid rounded shadow" style="max-height: 350px; object-fit: contain;">
+      </div>
+
+      <div class="col-md-7">
+        <span class="badge bg-primary mb-2">{{ categories[cat-1].nom }}</span>
+        <h1 class="fw-bold mb-2">{{ product.nom }}</h1>
+
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <span class="fs-2 fw-bold text-primary">{{ product.prix }} €</span>
+          {% if product.stock > 10 %}
+            <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>En stock</span>
+          {% elseif product.stock > 0 %}
+            <span class="badge bg-warning text-dark"><i class="bi bi-exclamation-circle me-1"></i>Stock faible ({{ product.stock }} restants)</span>
+          {% else %}
+            <span class="badge bg-danger"><i class="bi bi-x-circle me-1"></i>Rupture de stock</span>
+          {% endif %}
+        </div>
+
+        <div class="row g-3 mb-4">
+          <div class="col-6">
+            <div class="card border-0 bg-light p-3 text-center">
+              <small class="text-muted">Forme</small>
+              <strong>{{ product.forme }}</strong>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="card border-0 bg-light p-3 text-center">
+              <small class="text-muted">Dosage</small>
+              <strong>{{ product.dosage }} mg</strong>
+            </div>
+          </div>
+        </div>
+
+        <p class="text-muted mb-4">{{ product.description }}</p>
+
+        {% if product.stock > 0 %}
+          <form method="post" action="{{ path('app_panier_add', {id: product.id}) }}" class="d-flex align-items-center gap-3">
+            <div class="input-group" style="width: 130px;">
+              <span class="input-group-text">Qte</span>
+              <input type="number" name="quantite" value="1" min="1" max="{{ product.stock }}"
+                class="form-control text-center">
+            </div>
+            <button type="submit" class="btn btn-primary btn-lg">
+              <i class="bi bi-cart-plus me-2"></i>Ajouter au panier
+            </button>
+          </form>
+        {% else %}
+          <button class="btn btn-secondary btn-lg" disabled>
+            <i class="bi bi-x-circle me-2"></i>Rupture de stock
+          </button>
+        {% endif %}
+
+      </div>
+    </div>
+
+    <div class="mt-5">
+      <a href="{{ path('app_pharmacie_cat', {cat: cat}) }}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-1"></i>Retour a la categorie
+      </a>
+    </div>
+
+  </div>
+</section>
 {% endblock %}

@@ -101,7 +101,7 @@ class RendezVous
         return $this;
     }
 
-    public function getPatient(): ?patient
+    public function getPatient(): ?Patient
     {
         return $this->patient;
     }

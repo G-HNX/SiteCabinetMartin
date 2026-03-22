@@ -1,37 +1,99 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Register{% endblock %}
+{% block title %}Inscription — Cabinet Martin{% endblock %}
 
 {% block main %}
-    {% for flash_error in app.flashes('verify_email_error') %}
-        <div class="alert alert-danger" role="alert">{{ flash_error }}</div>
-    {% endfor %}
+<section class="section">
+  <div class="container" data-aos="fade-up">
+    <div class="row justify-content-center">
+      <div class="col-lg-6 col-md-9">
 
-    <h1 class="mb-4">S'inscrire</h1>
+        <div class="card shadow-sm border-0 mt-5 mb-5">
+          <div class="card-body p-4 p-md-5">
 
-    {{ form_start(registrationForm) }}
+            <div class="text-center mb-4">
+              <i class="bi bi-person-plus-fill fs-1 text-primary"></i>
+              <h2 class="mt-2">Creer un compte</h2>
+              <p class="text-muted small">Rejoignez le Cabinet Martin</p>
+            </div>
 
-        <div class="mb-3">
-            <label for="{{ registrationForm.email.vars.id }}">Email</label>
-            {{ form_widget(registrationForm.email, { attr: { class: 'form-control' } }) }}
-            {{ form_errors(registrationForm.email) }}
+            {% for flash_error in app.flashes('verify_email_error') %}
+              <div class="alert alert-danger d-flex align-items-center gap-2">
+                <i class="bi bi-exclamation-triangle-fill"></i>{{ flash_error }}
+              </div>
+            {% endfor %}
+
+            {{ form_start(registrationForm, { attr: { novalidate: 'novalidate' } }) }}
+
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label for="{{ registrationForm.nom.vars.id }}" class="form-label fw-semibold">Nom</label>
+                  {{ form_widget(registrationForm.nom, { attr: { class: 'form-control', placeholder: 'Martin' } }) }}
+                  {{ form_errors(registrationForm.nom) }}
+                </div>
+                <div class="col-md-6">
+                  <label for="{{ registrationForm.prenom.vars.id }}" class="form-label fw-semibold">Prenom</label>
+                  {{ form_widget(registrationForm.prenom, { attr: { class: 'form-control', placeholder: 'Jean' } }) }}
+                  {{ form_errors(registrationForm.prenom) }}
+                </div>
+              </div>
+
+              <div class="mb-3 mt-3">
+                <label for="{{ registrationForm.telephone.vars.id }}" class="form-label fw-semibold">
+                  Telephone <span class="text-muted fw-normal">(optionnel)</span>
+                </label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-telephone"></i></span>
+                  {{ form_widget(registrationForm.telephone, { attr: { class: 'form-control', placeholder: '06 00 00 00 00' } }) }}
+                </div>
+                {{ form_errors(registrationForm.telephone) }}
+              </div>
+
+              <div class="mb-3">
+                <label for="{{ registrationForm.email.vars.id }}" class="form-label fw-semibold">Email</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                  {{ form_widget(registrationForm.email, { attr: { class: 'form-control', placeholder: 'votre@email.fr' } }) }}
+                </div>
+                {{ form_errors(registrationForm.email) }}
+              </div>
+
+              <div class="mb-4">
+                <label for="{{ registrationForm.plainPassword.vars.id }}" class="form-label fw-semibold">Mot de passe</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                  {{ form_widget(registrationForm.plainPassword, { attr: { class: 'form-control', placeholder: '6 caracteres minimum' } }) }}
+                </div>
+                {{ form_errors(registrationForm.plainPassword) }}
+              </div>
+
+              <div class="mb-4 form-check">
+                {{ form_widget(registrationForm.agreeTerms, { attr: { class: 'form-check-input' } }) }}
+                <label class="form-check-label" for="{{ registrationForm.agreeTerms.vars.id }}">
+                  J'accepte les <a href="{{ path('app_politique') }}" target="_blank">conditions d'utilisation</a>
+                </label>
+                {{ form_errors(registrationForm.agreeTerms) }}
+              </div>
+
+              <div class="d-grid mb-3">
+                <button type="submit" class="btn btn-primary btn-lg">
+                  <i class="bi bi-person-check me-2"></i>Creer mon compte
+                </button>
+              </div>
+
+            {{ form_end(registrationForm) }}
+
+            <hr>
+            <p class="text-center mb-0 text-muted">
+              Deja inscrit ?
+              <a href="{{ path('app_login') }}" class="text-primary fw-semibold">Se connecter</a>
+            </p>
+
+          </div>
         </div>
 
-        <div class="mb-3">
-            <label for="{{ registrationForm.plainPassword.vars.id }}">Password</label>
-            {{ form_widget(registrationForm.plainPassword, { attr: { class: 'form-control' } }) }}
-            {{ form_errors(registrationForm.plainPassword) }}
-        </div>
-
-        <div class="form-check mb-4">
-            {{ form_widget(registrationForm.agreeTerms, { attr: { class: 'form-check-input' } }) }}
-            <label class="form-check-label" for="{{ registrationForm.agreeTerms.vars.id }}">
-                Agree terms
-            </label>
-            {{ form_errors(registrationForm.agreeTerms) }}
-        </div>
-
-        <button type="submit" class="btn btn-primary btn-lg">S'inscrire</button>
-
-    {{ form_end(registrationForm) }}
+      </div>
+    </div>
+  </div>
+</section>
 {% endblock %}

@@ -1,50 +1,67 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Réservation — Cabinet Martin{% endblock %}
+{% block title %}Confirmer le rendez-vous — Cabinet Martin{% endblock %}
 
 {% block main %}
-  <style>
-    .example-wrapper {
-      margin: 1em auto;
-      max-width: 800px;
-      width: 95%;
-      font: 18px/1.5 sans-serif;
-    }
+<section class="section">
+  <div class="container" data-aos="fade-up">
+    <div class="row justify-content-center">
+      <div class="col-lg-6 col-md-8">
 
-    .example-wrapper code {
-      background: #F5F5F5;
-      padding: 2px 6px;
-    }
+        <div class="section-title">
+          <h2>Confirmer le rendez-vous</h2>
+        </div>
 
-    .availability-table .btn {
-      min-width: 64px;
-    }
-  </style>
-
-  <div class="example-wrapper">
-    <h1>Votre réservation</h1>
-
-    <div class="container py-4">
-      {# Flash messages (réservation etc.) #}
-      {% for label, messages in app.flashes %}
-        {% for m in messages %}
-          <div class="alert alert-{{ label == 'success' ? 'success' : (label == 'error' ? 'danger' : 'info') }} alert-dismissible fade show" role="alert">
-            {{ m }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>
+        {% for label, messages in app.flashes %}
+          {% for m in messages %}
+            <div class="alert alert-{{ label == 'success' ? 'success' : (label == 'error' ? 'danger' : 'info') }} alert-dismissible fade show">
+              {{ m }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+          {% endfor %}
         {% endfor %}
-      {% endfor %}
 
-      {#
-        Insérer le formulaire ici pour réserver un slot avec un motif et un bouton
-        pour savoir si le client souhaite la téléconsultation.
-        Le patient doit être connecté.
-      #}
+        <div class="card border-0 shadow-sm">
+          <div class="card-body p-4">
 
-      <p>
-        {{ doctor }} — {{ slot }}
-      </p>
+            <div class="alert alert-primary d-flex gap-3 align-items-start mb-4">
+              <i class="bi bi-calendar-event-fill fs-4 mt-1"></i>
+              <div>
+                <strong>Medecin :</strong> Dr #{{ doctor }}<br>
+                <strong>Creneau :</strong> {{ slot|replace({'T': ' a '}) }}
+              </div>
+            </div>
+
+            <form id="rdv-form">
+              <div class="mb-4">
+                <label for="motif" class="form-label fw-semibold">Motif de la consultation</label>
+                <textarea id="motif" class="form-control" rows="3"
+                  placeholder="Ex : Consultation generale, renouvellement ordonnance..."></textarea>
+                <div class="form-text">Decrivez brievement la raison de votre visite.</div>
+              </div>
+
+              <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary btn-lg">
+                  <i class="bi bi-check-circle me-2"></i>Confirmer le rendez-vous
+                </button>
+                <a href="{{ path('app_rendez_vous') }}" class="btn btn-outline-secondary">
+                  <i class="bi bi-arrow-left me-1"></i>Choisir un autre creneau
+                </a>
+              </div>
+            </form>
+
+          </div>
+        </div>
+
+      </div>
     </div>
   </div>
+</section>
 
+<script>
+document.getElementById('rdv-form').addEventListener('submit', function(e) {
+  e.preventDefault();
+  var motif = document.getElementById('motif').value.trim() || 'consultation';
+  window.location.href = '/validation/{{ doctor }}/{{ slot }}/' + encodeURIComponent(motif);
+});
+</script>
 {% endblock %}

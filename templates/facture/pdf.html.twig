@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Facture #{{ commande.id }}</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: DejaVu Sans, sans-serif; font-size: 12px; color: #2c2c2c; padding: 40px; }
+
+    /* En-tête cabinet */
+    .header { display: table; width: 100%; margin-bottom: 40px; }
+    .header-left { display: table-cell; vertical-align: top; width: 60%; }
+    .header-right { display: table-cell; vertical-align: top; text-align: right; }
+    .cabinet-name { font-size: 22px; font-weight: bold; color: #1a3c5e; }
+    .cabinet-name span { color: #2aa4b5; }
+    .cabinet-info { color: #666; margin-top: 6px; line-height: 1.6; }
+
+    /* Badge facture */
+    .facture-title { font-size: 28px; font-weight: bold; color: #1a3c5e; }
+    .facture-meta { margin-top: 6px; color: #666; line-height: 1.7; }
+
+    /* Séparateur */
+    .divider { border: none; border-top: 2px solid #2aa4b5; margin: 24px 0; }
+
+    /* Infos patient */
+    .section-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #2aa4b5; font-weight: bold; margin-bottom: 6px; }
+    .patient-block { background: #f5f8fc; padding: 14px 18px; border-radius: 6px; margin-bottom: 28px; line-height: 1.7; }
+
+    /* Tableau */
+    table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+    thead tr { background: #1a3c5e; color: #fff; }
+    thead th { padding: 10px 12px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .5px; }
+    thead th.right { text-align: right; }
+    tbody tr { border-bottom: 1px solid #eef1f5; }
+    tbody tr:nth-child(even) { background: #f9fbfd; }
+    tbody td { padding: 10px 12px; }
+    tbody td.right { text-align: right; }
+
+    /* Total */
+    .total-row { display: table; width: 100%; margin-top: 8px; }
+    .total-spacer { display: table-cell; width: 65%; }
+    .total-box { display: table-cell; background: #1a3c5e; color: #fff; padding: 12px 18px; border-radius: 6px; text-align: right; }
+    .total-box .label { font-size: 11px; text-transform: uppercase; letter-spacing: .5px; opacity: .8; }
+    .total-box .amount { font-size: 20px; font-weight: bold; color: #2aa4b5; }
+
+    /* Pied */
+    .footer { margin-top: 50px; text-align: center; font-size: 10px; color: #aaa; border-top: 1px solid #eee; padding-top: 16px; }
+    .paid-stamp { border: 3px solid #28a745; color: #28a745; display: inline-block; padding: 4px 14px; border-radius: 4px; font-size: 13px; font-weight: bold; letter-spacing: 2px; transform: rotate(-5deg); margin-bottom: 20px; }
+  </style>
+</head>
+<body>
+
+  <!-- En-tête -->
+  <div class="header">
+    <div class="header-left">
+      <div class="cabinet-name">Cabinet <span>Martin</span></div>
+      <div class="cabinet-info">
+        7, rue des Archives — 53 000 Laval<br>
+        02 99 99 99 99 — cabinetmartinonline535@gmail.com<br>
+        Lun–Ven 8h–18h · Sam 8h–12h
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="facture-title">FACTURE</div>
+      <div class="facture-meta">
+        N° <strong>#{{ commande.id }}</strong><br>
+        Date : <strong>{{ commande.dateCommande|date('d/m/Y') }}</strong><br>
+        Heure : {{ commande.dateCommande|date('H:i') }}
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- Informations patient -->
+  <div class="section-label">Facture etablie pour</div>
+  <div class="patient-block">
+    {% set personne = commande.personne %}
+    <strong>{{ personne.prenom }} {{ personne.nom }}</strong><br>
+    {% if personne.telephone %}Tel : {{ personne.telephone }}<br>{% endif %}
+  </div>
+
+  <!-- Tampon payé -->
+  <div style="text-align: right; margin-bottom: 16px;">
+    <span class="paid-stamp">PAYEE</span>
+  </div>
+
+  <!-- Tableau des lignes -->
+  <div class="section-label">Detail de la commande</div>
+  <table>
+    <thead>
+      <tr>
+        <th style="width:50%">Medicament</th>
+        <th class="right" style="width:15%">Prix unit.</th>
+        <th class="right" style="width:15%">Qte</th>
+        <th class="right" style="width:20%">Sous-total</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% set total = 0 %}
+      {% for ligne in commande.lignesCommande %}
+        {% set sous_total = ligne.prix * ligne.quantite %}
+        {% set total = total + sous_total %}
+        <tr>
+          <td>{{ ligne.medicamentLigneCommande ? ligne.medicamentLigneCommande.nom : 'Article supprime' }}</td>
+          <td class="right">{{ ligne.prix }} €</td>
+          <td class="right">{{ ligne.quantite }}</td>
+          <td class="right"><strong>{{ sous_total|number_format(2, ',', ' ') }} €</strong></td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <!-- Total -->
+  <div class="total-row">
+    <div class="total-spacer"></div>
+    <div class="total-box">
+      <div class="label">Total TTC</div>
+      <div class="amount">{{ total|number_format(2, ',', ' ') }} €</div>
+    </div>
+  </div>
+
+  <!-- Pied de page -->
+  <div class="footer">
+    Cabinet Martin &mdash; 7, rue des Archives, 53 000 Laval &mdash; cabinetmartinonline535@gmail.com<br>
+    Document genere le {{ "now"|date("d/m/Y a H:i") }}
+  </div>
+
+</body>
+</html>

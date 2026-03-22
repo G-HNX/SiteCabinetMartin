@@ -1,41 +1,75 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Log in!{% endblock %}
+{% block title %}Connexion — Cabinet Martin{% endblock %}
 
 {% block main %}
-    <form method="post">
-        {% if error %}
-            <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
-        {% endif %}
+<section class="section">
+  <div class="container" data-aos="fade-up">
+    <div class="row justify-content-center">
+      <div class="col-lg-5 col-md-7">
 
-        {% if app.user %}
-            <div class="mb-3">
-                Vous êtes connecté en tant que {{ app.user.userIdentifier }}, <a href="{{ logout_path() }}">Déconnexion</a>
+        <div class="card shadow-sm border-0 mt-5 mb-5">
+          <div class="card-body p-4 p-md-5">
+
+            <div class="text-center mb-4">
+              <i class="bi bi-person-circle fs-1 text-primary"></i>
+              <h2 class="mt-2">Connexion</h2>
+              <p class="text-muted small">Acces a votre espace patient</p>
             </div>
-        {% endif %}
 
-        <h1 class="h3 mb-3 font-weight-normal">Se connecter</h1>
-        <label for="username">Email</label>
-        <input type="email" value="{{ last_username }}" name="_username" id="username" class="form-control" autocomplete="email" autofocus>
-        <label for="password">Mot de passe</label>
-        <input type="password" name="_password" id="password" class="form-control" autocomplete="current-password">
-        <input type="hidden" name="_csrf_token" data-controller="csrf-protection" value="{{ csrf_token('authenticate') }}">
+            {% if error %}
+              <div class="alert alert-danger d-flex align-items-center gap-2" role="alert">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                {{ error.messageKey|trans(error.messageData, 'security') }}
+              </div>
+            {% endif %}
 
-        {#
-            Uncomment this section and add a remember_me option below your firewall to activate remember me functionality.
-            See https://symfony.com/doc/current/security/remember_me.html
+            {% if app.user %}
+              <div class="alert alert-info">
+                Connecte en tant que <strong>{{ app.user.userIdentifier }}</strong>.
+                <a href="{{ logout_path() }}">Deconnexion</a>
+              </div>
+            {% endif %}
 
-            <div class="checkbox mb-3">
-                <input type="checkbox" name="_remember_me" id="_remember_me">
-                <label for="_remember_me">Remember me</label>
-            </div>
-        #}
-        <input type="hidden" name="_csrf_token" data-controller="csrf-protection" value="{{ csrf_token('authenticate') }}">
-        <button class="btn btn-lg btn-primary" type="submit">
-            Se connecter
-        </button>
-        <a href="{{ path('app_inscription')}}" > 
-        <button class="btn btn-lg btn-primary" > S'inscrire </button>
-        </a>
-    </form>
+            <form method="post">
+              <div class="mb-3">
+                <label for="username" class="form-label fw-semibold">Adresse email</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                  <input type="email" value="{{ last_username }}" name="_username" id="username"
+                    class="form-control" autocomplete="email" autofocus placeholder="votre@email.fr">
+                </div>
+              </div>
+
+              <div class="mb-4">
+                <label for="password" class="form-label fw-semibold">Mot de passe</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                  <input type="password" name="_password" id="password"
+                    class="form-control" autocomplete="current-password" placeholder="••••••••">
+                </div>
+              </div>
+
+              <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+              <div class="d-grid mb-3">
+                <button class="btn btn-primary btn-lg" type="submit">
+                  <i class="bi bi-box-arrow-in-right me-2"></i>Se connecter
+                </button>
+              </div>
+            </form>
+
+            <hr>
+            <p class="text-center mb-0 text-muted">
+              Pas encore de compte ?
+              <a href="{{ path('app_inscription') }}" class="text-primary fw-semibold">S'inscrire</a>
+            </p>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
 {% endblock %}

@@ -13,7 +13,14 @@ class Personne
     #[ORM\Column]
     private ?int $id = null;
 
-   
+    #[ORM\Column(length: 100, nullable: true)]
+    private ?string $nom = null;
+
+    #[ORM\Column(length: 100, nullable: true)]
+    private ?string $prenom = null;
+
+    #[ORM\Column(length: 15, nullable: true)]
+    private ?string $telephone = null;
 
     #[ORM\OneToOne(mappedBy: 'personne', cascade: ['persist', 'remove'])]
     private ?Patient $patient = null;
@@ -26,7 +33,39 @@ class Personne
         return $this->id;
     }
 
-    
+    public function getNom(): ?string
+    {
+        return $this->nom;
+    }
+
+    public function setNom(?string $nom): static
+    {
+        $this->nom = $nom;
+        return $this;
+    }
+
+    public function getPrenom(): ?string
+    {
+        return $this->prenom;
+    }
+
+    public function setPrenom(?string $prenom): static
+    {
+        $this->prenom = $prenom;
+        return $this;
+    }
+
+    public function getTelephone(): ?string
+    {
+        return $this->telephone;
+    }
+
+    public function setTelephone(?string $telephone): static
+    {
+        $this->telephone = $telephone;
+        return $this;
+    }
+
     public function getPatient(): ?Patient
     {
         return $this->patient;

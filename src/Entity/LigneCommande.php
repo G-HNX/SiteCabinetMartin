@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\LigneCommandeRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: LigneCommandeRepository::class)]
@@ -18,6 +19,15 @@ class LigneCommande
 
     #[ORM\ManyToOne(inversedBy: 'lignesCommande')]
     private ?Commande $commande = null;
+
+    #[ORM\ManyToOne(inversedBy: 'lignesCommande')]
+    private ?Medicament $medicamentLigneCommande = null;
+
+    #[ORM\Column]
+    private ?int $quantite = null;
+
+    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
+    private ?string $prix = null;
 
     public function getId(): ?int
     {
@@ -44,6 +54,43 @@ class LigneCommande
     public function setCommande(?Commande $commande): static
     {
         $this->commande = $commande;
+
+        return $this;
+    }
+
+    public function getMedicamentLigneCommande(): ?Medicament
+    {
+        return $this->medicamentLigneCommande;
+    }
+
+    public function setMedicamentLigneCommande(?Medicament $medicamentLigneCommande): static
+    {
+        $this->medicamentLigneCommande = $medicamentLigneCommande;
+
+        return $this;
+    }
+
+    public function getQuantite(): ?int
+    {
+        return $this->quantite;
+    }
+
+    public function setQuantite(int $quantite): static
+    {
+        $this->quantite = $quantite;
+        $this->qtiteLigneCommande = $quantite;
+
+        return $this;
+    }
+
+    public function getPrix(): ?string
+    {
+        return $this->prix;
+    }
+
+    public function setPrix(string $prix): static
+    {
+        $this->prix = $prix;
 
         return $this;
     }

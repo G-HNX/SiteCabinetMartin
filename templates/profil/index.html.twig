@@ -1,21 +1,175 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello ProfilController!{% endblock %}
+{% block title %}Mon profil — Cabinet Martin{% endblock %}
 
 {% block main %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+<section class="section">
+  <div class="container" data-aos="fade-up">
 
-<div class="example-wrapper">
-    {{ dump(patient)}}
-    {{ dump(personne)}}
+    <div class="section-title">
+      <h2>Mon espace patient</h2>
+      <p>Retrouvez vos informations, rendez-vous et commandes</p>
+    </div>
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>C:/wamp64/www/my_project/src/Controller/ProfilController.php</code></li>
-        <li>Your template at <code>C:/wamp64/www/my_project/templates/profil/index.html.twig</code></li>
-    </ul>
-</div>
+    {% for label, messages in app.flashes %}
+      {% for m in messages %}
+        <div class="alert alert-{{ label == 'success' ? 'success' : (label == 'error' ? 'danger' : 'info') }} alert-dismissible fade show" role="alert">
+          {{ m }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      {% endfor %}
+    {% endfor %}
+
+    {# --- Informations personnelles --- #}
+    <div class="row g-4 mb-5">
+      <div class="col-lg-4">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body text-center p-4">
+            <div class="mb-3">
+              <i class="bi bi-person-circle text-primary" style="font-size: 4rem;"></i>
+            </div>
+            <h4 class="fw-bold mb-1">
+              {% if personne.prenom or personne.nom %}
+                {{ personne.prenom }} {{ personne.nom }}
+              {% else %}
+                Patient
+              {% endif %}
+            </h4>
+            <p class="text-muted mb-3">{{ app.user.email }}</p>
+            {% if personne.telephone %}
+              <p class="mb-0"><i class="bi bi-telephone me-2 text-primary"></i>{{ personne.telephone }}</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      {# --- Stats rapides --- #}
+      <div class="col-lg-8">
+        <div class="row g-3 h-100">
+          <div class="col-sm-6">
+            <div class="card border-0 shadow-sm text-center p-4">
+              <i class="bi bi-calendar-check text-primary fs-1 mb-2"></i>
+              <h3 class="fw-bold">{{ rdvs|length }}</h3>
+              <p class="text-muted mb-0">Rendez-vous</p>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="card border-0 shadow-sm text-center p-4">
+              <i class="bi bi-bag-check text-success fs-1 mb-2"></i>
+              <h3 class="fw-bold">{{ commandes|length }}</h3>
+              <p class="text-muted mb-0">Commandes</p>
+            </div>
+          </div>
+          <div class="col-12 d-flex align-items-end">
+            <a href="{{ path('app_rendez_vous') }}" class="btn btn-primary me-2">
+              <i class="bi bi-calendar-plus me-1"></i>Prendre un RDV
+            </a>
+            <a href="{{ path('app_pharmacie') }}" class="btn btn-outline-primary">
+              <i class="bi bi-capsule me-1"></i>Pharmacie
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {# --- Mes rendez-vous --- #}
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-header bg-white border-bottom py-3">
+        <h5 class="mb-0 fw-bold"><i class="bi bi-calendar3 me-2 text-primary"></i>Mes rendez-vous</h5>
+      </div>
+      <div class="card-body p-0">
+        {% if rdvs is empty %}
+          <div class="text-center py-5 text-muted">
+            <i class="bi bi-calendar-x fs-1 mb-3 d-block"></i>
+            Aucun rendez-vous pour le moment.
+            <div class="mt-3">
+              <a href="{{ path('app_rendez_vous') }}" class="btn btn-sm btn-primary">Prendre un rendez-vous</a>
+            </div>
+          </div>
+        {% else %}
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th>Date et heure</th>
+                  <th>Medecin</th>
+                  <th>Motif</th>
+                  <th>Statut</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for rdv in rdvs %}
+                  <tr>
+                    <td>
+                      <strong>{{ rdv.dateDebutRDV|date('d/m/Y') }}</strong>
+                      <span class="text-muted ms-1">{{ rdv.dateDebutRDV|date('H:i') }} — {{ rdv.dateFinRDV|date('H:i') }}</span>
+                    </td>
+                    <td>{{ rdv.medecin.specMedecin ?? 'Medecin' }}</td>
+                    <td>{{ rdv.commentaireRDV ?? '—' }}</td>
+                    <td>
+                      {% if rdv.disponibiliteRDV %}
+                        <span class="badge bg-success">Disponible</span>
+                      {% else %}
+                        <span class="badge bg-primary">Confirme</span>
+                      {% endif %}
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    {# --- Mes commandes --- #}
+    <div class="card border-0 shadow-sm mb-5">
+      <div class="card-header bg-white border-bottom py-3">
+        <h5 class="mb-0 fw-bold"><i class="bi bi-bag me-2 text-primary"></i>Mes commandes</h5>
+      </div>
+      <div class="card-body p-0">
+        {% if commandes is empty %}
+          <div class="text-center py-5 text-muted">
+            <i class="bi bi-bag-x fs-1 mb-3 d-block"></i>
+            Aucune commande pour le moment.
+            <div class="mt-3">
+              <a href="{{ path('app_pharmacie') }}" class="btn btn-sm btn-primary">Aller a la pharmacie</a>
+            </div>
+          </div>
+        {% else %}
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th>Date</th>
+                  <th>Articles</th>
+                  <th>Total</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for commande in commandes %}
+                  {% set total = 0 %}
+                  {% for ligne in commande.lignesCommande %}
+                    {% set total = total + (ligne.prix * ligne.quantite) %}
+                  {% endfor %}
+                  <tr>
+                    <td><strong>{{ commande.dateCommande|date('d/m/Y H:i') }}</strong></td>
+                    <td>{{ commande.lignesCommande|length }} article(s)</td>
+                    <td><strong>{{ total|number_format(2, '.', ',') }} €</strong></td>
+                    <td>
+                      <a href="{{ path('app_facture') }}" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-receipt me-1"></i>Facture
+                      </a>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+  </div>
+</section>
 {% endblock %}

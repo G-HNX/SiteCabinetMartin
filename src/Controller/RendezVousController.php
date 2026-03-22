@@ -2,28 +2,35 @@
 
 namespace App\Controller;
 
+use App\Entity\Medecin;
+use App\Entity\RendezVous;
+use App\Repository\MedecinRepository;
 use DateInterval;
 use DatePeriod;
 use DateTimeImmutable;
 use DateTimeZone;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Address;
 use Symfony\Component\Routing\Attribute\Route;
 
 final class RendezVousController extends AbstractController
 {
   #[Route('/rendezvous/{mode}/{day}', name: 'app_rendez_vous', defaults: ['mode' => 'move', 'day' => 0])]
-  public function index(Request $request, string $mode = 'move', int $day = 0): Response
+  public function index(Request $request, MedecinRepository $medecinRepository, string $mode = 'move', int $day = 0): Response
   {
     // --- Offset persistant en session (0 = aujourd'hui) ---
     $session = $request->getSession();
     $offset = (int) $session->get('rdv_offset', 0);
 
     // Modes :
-    // - move: décale l’offset courant de {day} (peut être ±1, ±7, …), clamp à [0..+inf]
-    // - set: fixe l’offset à {day} (clamp à [0..+inf])
-    // - reset: remet à 0 (aujourd’hui)
+    // - move: décale l'offset courant de {day} (peut être ±1, ±7, …), clamp à [0..+inf]
+    // - set: fixe l'offset à {day} (clamp à [0..+inf])
+    // - reset: remet à 0 (aujourd'hui)
     switch ($mode) {
       case 'move':
         $offset += (int) $day;
@@ -37,16 +44,20 @@ final class RendezVousController extends AbstractController
     }
 
     if ($offset < 0) {
-      $offset = 0; // on ne va jamais après aujourd’hui
+      $offset = 0; // on ne va jamais après aujourd'hui
     }
 
     $session->set('rdv_offset', $offset);
 
-    // Données d’exemple
-    $doctors = [
-      ['id' => 'martin', 'name' => 'Dr Martin', 'speciality' => 'Médecine interne'],
-      ['id' => 'house', 'name' => 'Dr House', 'speciality' => 'Médecine générale'],
-    ];
+    // Medecins depuis la base de donnees
+    $doctors = [];
+    foreach ($medecinRepository->findAll() as $m) {
+      $doctors[] = [
+        'id' => $m->getId(),
+        'name' => 'Dr #' . $m->getId(),
+        'speciality' => $m->getSpecMedecin() ?? 'Medecine generale',
+      ];
+    }
 
     $tz = new DateTimeZone('Europe/Paris');
     $today = new DateTimeImmutable('today', $tz); // minuit à Paris
@@ -56,14 +67,9 @@ final class RendezVousController extends AbstractController
     $slotMins = 30;
     $ranges = [['08:00', '12:00'], ['13:00', '18:00']];
 
-    // Réservations ou indisponibilités d’exemple (non décalées)
-    $booked = [
-      'martin|' . $today->modify('+1 day')->format('Y-m-d') . ' 09:00',
-      'martin|' . $today->modify('+1 day')->format('Y-m-d') . ' 10:30',
-      'house|' . $today->modify('+2 day')->format('Y-m-d') . ' 14:00',
-    ];
+    $booked = [];
 
-    // Génération lundi→vendredi à partir de l’ancre
+    // Génération lundi→vendredi à partir de l'ancre
     $calendar = [];
     $cursor = $anchor;
 
@@ -86,7 +92,7 @@ final class RendezVousController extends AbstractController
     return $this->render('rendez_vous/index.html.twig', [
       'doctors' => $doctors,
       'calendar' => $calendar,
-      'offset' => $offset, // pour l’UI
+      'offset' => $offset, // pour l'UI
     ]);
   }
 
@@ -119,7 +125,7 @@ final class RendezVousController extends AbstractController
   #[Route('/reserver/{doctor}/{slot}', name: 'reservation_new', requirements: ['slot' => '[0-9T:-]+'])]
   public function reservation(string $doctor, string $slot): Response
   {
-    // On ne touche pas à l’offset (il reste tel qu’il est en session)
+    // On ne touche pas à l'offset (il reste tel qu'il est en session)
     return $this->render('rendez_vous/reservation.html.twig', [
       'doctor' => $doctor,
       'slot' => $slot,
@@ -127,15 +133,48 @@ final class RendezVousController extends AbstractController
   }
 
   #[Route('/validation/{doctor}/{slot}/{motif}', name: 'reservation_add', requirements: ['slot' => '[0-9T:-]+'])]
-  public function validate(string $doctor, string $slot, string $motif): Response
+  public function validate(string $doctor, string $slot, string $motif, EntityManagerInterface $em, MailerInterface $mailer): Response
   {
-    $dt = DateTimeImmutable::createFromFormat('Y-m-d\\TH:i', $slot);
+    $this->denyAccessUnlessGranted('ROLE_USER');
 
-    if (! $dt) {
+    $dt = DateTimeImmutable::createFromFormat('Y-m-d\\TH:i', $slot);
+    if (!$dt) {
       throw $this->createNotFoundException('Créneau invalide');
     }
 
-    $this->addFlash('success', sprintf('Créneau réservé avec %s le %s.', $doctor, $dt->format('d/m/Y H:i')));
+    $medecin = $em->getRepository(Medecin::class)->find((int) $doctor);
+    if (!$medecin) {
+      throw $this->createNotFoundException('Médecin introuvable');
+    }
 
+    $patient = $this->getUser()->getPersonne()->getPatient();
+
+    $rdv = new RendezVous();
+    $rdv->setDateDebutRDV($dt);
+    $rdv->setDateFinRDV($dt->modify('+30 minutes'));
+    $rdv->setCommentaireRDV($motif);
+    $rdv->setDisponibiliteRDV(false);
+    $rdv->setMedecin($medecin);
+    $rdv->setPatient($patient);
+
+    $em->persist($rdv);
+    $em->flush();
+
+    // Email de confirmation
+    try {
+      $email = (new TemplatedEmail())
+        ->from(new Address('cabinetmartinonline535@gmail.com', 'Cabinet Martin'))
+        ->to($this->getUser()->getEmail())
+        ->subject('Confirmation de votre rendez-vous du ' . $dt->format('d/m/Y à H:i'))
+        ->htmlTemplate('email/rdv_confirmation.html.twig')
+        ->context(['rdv' => $rdv]);
+      $mailer->send($email);
+    } catch (\Exception) {
+      // L'envoi d'email ne bloque pas la confirmation
+    }
+
+    $this->addFlash('success', sprintf('Rendez-vous confirmé le %s.', $dt->format('d/m/Y H:i')));
+
+    return $this->redirectToRoute('app_profil');
   }
 }

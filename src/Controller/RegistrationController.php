@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
@@ -35,6 +36,12 @@ class RegistrationController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
 
+            // Vérification unicité email
+            if ($entityManager->getRepository(User::class)->findOneBy(['email' => $user->getEmail()])) {
+                $form->get('email')->addError(new FormError('Cette adresse email est deja utilisee.'));
+                return $this->render('registration/register.html.twig', ['registrationForm' => $form]);
+            }
+
             // Mot de passe
             $plainPassword = $form->get('plainPassword')->getData();
             $user->setPassword($userPasswordHasher->hashPassword($user, $plainPassword));
@@ -44,6 +51,9 @@ class RegistrationController extends AbstractController
 
             // 🔥 Création automatique de Personne
             $personne = new Personne();
+            $personne->setNom($form->get('nom')->getData());
+            $personne->setPrenom($form->get('prenom')->getData());
+            $personne->setTelephone($form->get('telephone')->getData());
             $personne->setPersonneUser($user);
             $entityManager->persist($personne);
 
@@ -79,24 +89,24 @@ class RegistrationController extends AbstractController
         $id = $request->query->get('id');
 
         if (null === $id) {
-            return $this->redirectToRoute('app_register');
+            return $this->redirectToRoute('app_inscription');
         }
 
         $user = $userRepository->find($id);
 
         if (null === $user) {
-            return $this->redirectToRoute('app_register');
+            return $this->redirectToRoute('app_inscription');
         }
 
         try {
             $this->emailVerifier->handleEmailConfirmation($request, $user);
         } catch (VerifyEmailExceptionInterface $exception) {
             $this->addFlash('verify_email_error', $translator->trans($exception->getReason(), [], 'VerifyEmailBundle'));
-            return $this->redirectToRoute('app_register');
+            return $this->redirectToRoute('app_inscription');
         }
 
         $this->addFlash('success', 'Your email address has been verified.');
 
-        return $this->redirectToRoute('app_register');
+        return $this->redirectToRoute('app_inscription');
     }
 }
