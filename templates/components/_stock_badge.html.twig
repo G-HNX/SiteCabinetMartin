@@ -1,0 +1,7 @@
+{% if stock <= 0 %}
+    <span class="stock-badge stock-badge--out"><i class="bi bi-x-circle" aria-hidden="true"></i> Rupture de stock</span>
+{% elseif stock < 10 %}
+    <span class="stock-badge stock-badge--low"><i class="bi bi-exclamation-circle" aria-hidden="true"></i> Plus que {{ stock }} en stock</span>
+{% else %}
+    <span class="stock-badge stock-badge--ok"><i class="bi bi-check-circle" aria-hidden="true"></i> En stock</span>
+{% endif %}

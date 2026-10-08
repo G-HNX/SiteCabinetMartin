@@ -1,379 +1,195 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8">       
-        <meta content="width=device-width, initial-scale=1.0" name="viewport">
-        <title>{% block title %}Cabinet Martin{% endblock %}</title>
-        <meta name="description" content="">
-        <meta name="keywords" content="">
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#0e4f5c">
+    <title>{% block title %}Cabinet Martin{% endblock %}</title>
+    <meta name="description" content="{% block meta_description %}Cabinet Martin à Laval : prise de rendez-vous en ligne, pharmacie en ligne et espace patient sécurisé.{% endblock %}">
 
-       <!-- Favicons -->
-  <link href="{{ asset('/img/favicon.png') }}" rel="icon">
-  <link href="{{ asset('/img/apple-touch-icon.png') }}" rel="apple-touch-icon">
+    <link rel="icon" type="image/svg+xml" href="{{ asset('img/favicon.svg') }}">
 
-  <!-- Fonts -->
-  <link href="https://fonts.googleapis.com" rel="preconnect">
-  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Raleway:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&display=swap" rel="stylesheet">
 
-
-  <!-- Vendor CSS Files -->
-  <link href="{{ asset('/vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
-  <link href="{{ asset('/vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
-  <link href="{{ asset('/vendor/aos/aos.css') }}" rel="stylesheet">
-  <link href="{{ asset('/vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet">
-  <link href="{{ asset('/vendor/glightbox/css/glightbox.min.css') }}"  rel="stylesheet">
-  <link href="{{ asset('/vendor/swiper/swiper-bundle.min.css') }}" rel="stylesheet">
-
-  <!-- Main CSS File -->
-  <link href="{{ asset('/css/main.css') }}" rel="stylesheet">
-
-  <style>
-    /* ── Panier badge dans la nav ── */
-    .nav-cart-wrap {
-      position: relative;
-      display: inline-flex;
-      align-items: center;
-    }
-    .nav-cart-badge {
-      position: absolute;
-      top: -6px; right: -8px;
-      background: #e63946;
-      color: #fff;
-      border-radius: 10px;
-      font-size: .6rem;
-      font-weight: 700;
-      min-width: 16px;
-      height: 16px;
-      line-height: 16px;
-      text-align: center;
-      padding: 0 4px;
-      pointer-events: none;
-    }
-
-    /* ── Chip utilisateur connecté ── */
-    .nav-user-chip {
-      display: inline-flex !important;
-      align-items: center;
-      gap: 5px;
-      background: rgba(255,255,255,.15);
-      border-radius: 20px;
-      padding: 4px 12px !important;
-      font-size: .82rem !important;
-      white-space: nowrap;
-      border: 1px solid rgba(255,255,255,.25);
-    }
-    .nav-user-chip:hover {
-      background: rgba(255,255,255,.25) !important;
-    }
-
-    /* ── Icône déconnexion ── */
-    .nav-logout-link {
-      opacity: .75;
-      font-size: 1.1rem !important;
-      padding: 0 6px !important;
-    }
-    .nav-logout-link:hover { opacity: 1; }
-
-    /* ── Séparateur dans les dropdowns ── */
-    .dropdown-divider {
-      margin: 4px 12px;
-      border-color: rgba(0,0,0,.08);
-    }
-
-    /* ── Icônes dans les items de dropdown ── */
-    #navmenu .dropdown ul a i {
-      font-size: .85rem;
-      opacity: .7;
-    }
-
-    /* ── Séparateur vertical entre nav et compte ── */
-    #navmenu ul li.nav-sep {
-      display: flex;
-      align-items: center;
-      padding: 0 10px;
-      pointer-events: none;
-    }
-    #navmenu ul li.nav-sep::after {
-      content: '';
-      display: block;
-      width: 1px;
-      height: 20px;
-      background: #d0d8e4;
-    }
-
-    /* ── Encadré compte ── */
-    #navmenu ul li.nav-account > a {
-      border: 1.5px solid #b0bece !important;
-      border-radius: 8px !important;
-      padding: 5px 14px !important;
-      margin-left: 4px;
-      transition: background .2s, border-color .2s, color .2s !important;
-    }
-    #navmenu ul li.nav-account > a:hover,
-    #navmenu ul li.nav-account > a.active {
-      background: #f0f5fb !important;
-      border-color: #2aa4b5 !important;
-      color: #2aa4b5 !important;
-    }
-
-    /* Mobile : on retire l'encadré */
-    @media (max-width: 1199px) {
-      #navmenu ul li.nav-sep { display: none !important; }
-      #navmenu ul li.nav-account > a {
-        border: none !important;
-        border-radius: 0 !important;
-        margin-left: 0;
-        padding: 10px 20px !important;
-      }
-    }
-  </style>
-
-  <!-- =======================================================
-  * Template Name: Medilab
-  * Template URL: https://bootstrapmade.com/medilab-free-medical-bootstrap-theme/
-  * Updated: Aug 07 2024 with Bootstrap v5.3.3
-  * Author: BootstrapMade.com
-  * License: https://bootstrapmade.com/license/
-  ======================================================== -->
+    {% block javascripts %}
+        {{ importmap('app') }}
+    {% endblock %}
 </head>
-    <body class="index-page">
-        {% set current = app.request.attributes.get('_route') %}
-        {% set cartCount = app.request.session.get('count', 0) %}
+{# Turbo Drive désactivé : pages classiques, téléchargements PDF et scripts sans surprise #}
+<body data-turbo="false" class="{% block body_class %}{% endblock %}">
+{% set current = app.request.attributes.get('_route') ?? '' %}
+{% set cartCount = cart_count() %}
+{% set isMedecin = app.user and is_granted('ROLE_MEDECIN') %}
 
-        <!-- Entete -->
-        <header id="header" class="header sticky-top">
+<a class="skip-link" href="#contenu">Aller au contenu</a>
 
-            <!-- Topbar -->
-            <div class="topbar d-flex align-items-center">
-                <div class="container d-flex justify-content-center justify-content-md-between">
-                    <div class="contact-info d-flex align-items-center">
-                        <i class="bi bi-envelope d-flex align-items-center">
-                            <a href="mailto:cabinetmartinonline535@gmail.com">cabinetmartinonline535@gmail.com</a>
-                        </i>
-                        <i class="bi bi-phone d-flex align-items-center ms-4">
-                            <span>02 99 99 99 99</span>
-                        </i>
-                        <i class="bi bi-clock d-none d-lg-flex align-items-center ms-4">
-                            <span>Lun–Ven 8h–18h &nbsp;&bull;&nbsp; Sam 8h–12h</span>
-                        </i>
-                    </div>
-                    <div class="social-links d-none d-md-flex align-items-center">
-                        <a href="#" class="twitter"><i class="bi bi-twitter-x"></i></a>
-                        <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>
-                        <a href="#" class="instagram"><i class="bi bi-instagram"></i></a>
-                        <a href="#" class="linkedin"><i class="bi bi-linkedin"></i></a>
-                    </div>
-                </div>
-            </div><!-- End Topbar -->
+{# ===== Notifications (flashes) ===== #}
+<div class="toasts" aria-live="polite" aria-atomic="false">
+    {% for type, messages in app.flashes %}
+        {% set kind = type in ['error', 'danger', 'verify_email_error'] ? 'error' : (type == 'success' ? 'success' : 'info') %}
+        {% for message in messages %}
+            <div class="toast-c toast-c--{{ kind }}" role="{{ kind == 'error' ? 'alert' : 'status' }}" data-controller="flash">
+                <i class="bi {{ kind == 'success' ? 'bi-check-circle-fill' : (kind == 'error' ? 'bi-exclamation-triangle-fill' : 'bi-info-circle-fill') }}" aria-hidden="true"></i>
+                <p>{{ message }}</p>
+                <button type="button" class="toast-c__close" data-action="flash#close" aria-label="Fermer la notification"><i class="bi bi-x-lg" aria-hidden="true"></i></button>
+            </div>
+        {% endfor %}
+    {% endfor %}
+</div>
 
-            <!-- Branding + Nav -->
-            <div class="branding d-flex align-items-center">
-                <div class="container position-relative d-flex align-items-center justify-content-between">
+{# ===== Bandeau de vérification d'email ===== #}
+{% if app.user and not app.user.verified %}
+    <div class="verify-bar">
+        <div class="container verify-bar__inner">
+            <p>
+                <i class="bi bi-envelope-exclamation" aria-hidden="true"></i>
+                <strong>Confirmez votre adresse email.</strong>
+                <span>Un lien vous a été envoyé. En démonstration, les emails arrivent dans <a href="http://localhost:8025" target="_blank" rel="noopener">Mailpit</a>.</span>
+            </p>
+            <form method="post" action="{{ path('app_verify_resend') }}">
+                <input type="hidden" name="_token" value="{{ csrf_token('verify_resend') }}">
+                <button type="submit" class="verify-bar__btn">Renvoyer l'email</button>
+            </form>
+        </div>
+    </div>
+{% endif %}
 
-                    <a href="{{ path('app_home') }}" class="logo d-flex align-items-center me-auto">
-                        <h1 class="sitename">Cabinet Martin</h1>
-                    </a>
+{# ===== En-tête ===== #}
+<header class="site-header" data-controller="nav">
+    <div class="topbar">
+        <div class="container topbar__inner">
+            <p class="topbar__item"><i class="bi bi-clock" aria-hidden="true"></i> Lun–Ven 8h–18h · Sam 8h–12h</p>
+            <p class="topbar__item">
+                <a href="tel:+33299999999"><i class="bi bi-telephone" aria-hidden="true"></i> 02 99 99 99 99</a>
+                <a href="mailto:contact@cabinet-martin.fr" class="d-none d-md-inline"><i class="bi bi-envelope" aria-hidden="true"></i> contact@cabinet-martin.fr</a>
+            </p>
+        </div>
+    </div>
 
-                    <nav id="navmenu" class="navmenu">
-                        {% set cabinetActive = current in ['app_about', 'app_medecin'] %}
-                        {% set servicesActive = (current starts with 'app_pharmacie') or current == 'app_teleconsultation' %}
-                        {% set compteActive = current in ['app_profil', 'app_facture'] %}
-                        <ul>
+    <div class="container navbar-c">
+        <a href="{{ path('app_home') }}" class="brand" aria-label="Cabinet Martin — accueil">
+            {% include 'components/_brand_mark.html.twig' %}
+            <span class="brand__text">Cabinet <em>Martin</em></span>
+        </a>
 
-                            <!-- Accueil -->
-                            <li>
-                                <a href="{{ path('app_home') }}" class="{{ current == 'app_home' ? 'active' : '' }}">Accueil</a>
-                            </li>
+        <nav class="nav-panel" id="menu-principal" aria-label="Navigation principale" data-nav-target="panel">
+            <ul class="nav-links">
+                <li><a href="{{ path('app_home') }}" class="{{ current == 'app_home' ? 'is-active' }}" {{ current == 'app_home' ? 'aria-current="page"' }}>Accueil</a></li>
+                <li><a href="{{ path('app_about') }}" class="{{ current == 'app_about' ? 'is-active' }}" {{ current == 'app_about' ? 'aria-current="page"' }}>À propos</a></li>
+                <li><a href="{{ path('app_medecin') }}" class="{{ current == 'app_medecin' ? 'is-active' }}" {{ current == 'app_medecin' ? 'aria-current="page"' }}>Médecins</a></li>
+                <li><a href="{{ path('app_pharmacie') }}" class="{{ current starts with 'app_pharmacie' ? 'is-active' }}">Pharmacie</a></li>
+                <li><a href="{{ path('app_teleconsultation') }}" class="{{ current == 'app_teleconsultation' ? 'is-active' }}" {{ current == 'app_teleconsultation' ? 'aria-current="page"' }}>Téléconsultation</a></li>
+                <li><a href="{{ path('app_contact') }}" class="{{ current == 'app_contact' ? 'is-active' }}" {{ current == 'app_contact' ? 'aria-current="page"' }}>Contact</a></li>
+            </ul>
 
-                            <!-- Le Cabinet -->
-                            <li class="dropdown">
-                                <a href="#" class="{{ cabinetActive ? 'active' : '' }}">
-                                    <span>Le Cabinet</span>
-                                    <i class="bi bi-chevron-down toggle-dropdown"></i>
-                                </a>
-                                <ul>
-                                    <li>
-                                        <a href="{{ path('app_about') }}" class="{{ current == 'app_about' ? 'active' : '' }}">
-                                            <i class="bi bi-info-circle me-2"></i>A propos
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="{{ path('app_medecin') }}" class="{{ current == 'app_medecin' ? 'active' : '' }}">
-                                            <i class="bi bi-person-badge me-2"></i>Nos medecins
-                                        </a>
-                                    </li>
-                                </ul>
-                            </li>
+            <div class="nav-actions">
+                <a href="{{ path('app_rendez_vous') }}" class="btn btn-accent btn-sm nav-cta"><i class="bi bi-calendar2-check" aria-hidden="true"></i> Prendre rendez-vous</a>
 
-                            <!-- Services -->
-                            <li class="dropdown">
-                                <a href="#" class="{{ servicesActive ? 'active' : '' }}">
-                                    <span>Services</span>
-                                    <i class="bi bi-chevron-down toggle-dropdown"></i>
-                                </a>
-                                <ul>
-                                    <li>
-                                        <a href="{{ path('app_pharmacie') }}" class="{{ (current starts with 'app_pharmacie') ? 'active' : '' }}">
-                                            <i class="bi bi-capsule me-2"></i>Pharmacie en ligne
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="{{ path('app_teleconsultation') }}" class="{{ current == 'app_teleconsultation' ? 'active' : '' }}">
-                                            <i class="bi bi-camera-video me-2"></i>Teleconsultation
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="{{ path('app_rendez_vous') }}" class="{{ current == 'app_rendez_vous' ? 'active' : '' }}">
-                                            <i class="bi bi-calendar-check me-2"></i>Prendre un RDV
-                                        </a>
-                                    </li>
-                                </ul>
-                            </li>
-
-                            <!-- Contact -->
-                            <li>
-                                <a href="{{ path('app_contact') }}" class="{{ current == 'app_contact' ? 'active' : '' }}">Contact</a>
-                            </li>
-
-                            <!-- Séparateur -->
-                            <li class="nav-sep d-none d-xl-flex"></li>
-
-                            <!-- Mon compte -->
-                            {% if app.user %}
-                                <li class="dropdown nav-account">
-                                    <a href="#" class="{{ compteActive ? 'active' : '' }}">
-                                        <span class="nav-user-chip">
-                                            <i class="bi bi-person-circle"></i>
-                                            {{ app.user.getPersonne().getPrenom() ?? app.user.email }}
-                                        </span>
-                                        <i class="bi bi-chevron-down toggle-dropdown"></i>
-                                    </a>
-                                    <ul>
-                                        <li>
-                                            <a href="{{ path('app_profil') }}" class="{{ current == 'app_profil' ? 'active' : '' }}">
-                                                <i class="bi bi-person me-2"></i>Mon profil
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a href="{{ path('app_facture') }}" class="{{ current == 'app_facture' ? 'active' : '' }}">
-                                                <i class="bi bi-receipt me-2"></i>Mes factures
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a href="{{ path('app_rendez_vous') }}" class="{{ current == 'app_rendez_vous' ? 'active' : '' }}">
-                                                <i class="bi bi-calendar me-2"></i>Mes rendez-vous
-                                            </a>
-                                        </li>
-                                        <li><hr class="dropdown-divider"></li>
-                                        <li>
-                                            <a href="{{ path('app_logout') }}">
-                                                <i class="bi bi-box-arrow-right me-2"></i>Deconnexion
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </li>
+                {% if app.user %}
+                    <div class="account" data-controller="dropdown">
+                        <button type="button" class="account__btn" data-dropdown-target="button" data-action="dropdown#toggle" aria-expanded="false" aria-haspopup="true">
+                            <span class="account__avatar" aria-hidden="true">{{ (app.user.personne ? app.user.personne.prenom : app.user.email)|first|upper }}</span>
+                            <span class="account__name">{{ app.user.personne ? app.user.personne.prenom : 'Mon compte' }}</span>
+                            <i class="bi bi-chevron-down account__chevron" aria-hidden="true"></i>
+                        </button>
+                        <div class="account__menu" data-dropdown-target="menu">
+                            <p class="account__mail">{{ app.user.userIdentifier }}</p>
+                            {% if not isMedecin %}
+                                <a href="{{ path('app_profil') }}"><i class="bi bi-person-circle" aria-hidden="true"></i> Mon espace patient</a>
+                                <a href="{{ path('app_facture') }}"><i class="bi bi-receipt" aria-hidden="true"></i> Mes factures</a>
                             {% else %}
-                                <li class="nav-account">
-                                    <a href="{{ path('app_login') }}" class="{{ current == 'app_login' ? 'active' : '' }}">
-                                        <i class="bi bi-person me-1"></i>Connexion
-                                    </a>
-                                </li>
+                                <p class="account__note"><i class="bi bi-person-badge" aria-hidden="true"></i> Compte médecin</p>
                             {% endif %}
+                            <a href="{{ path('app_logout') }}" class="is-danger"><i class="bi bi-box-arrow-right" aria-hidden="true"></i> Se déconnecter</a>
+                        </div>
+                    </div>
+                {% else %}
+                    <a href="{{ path('app_login') }}" class="btn btn-ghost btn-sm"><i class="bi bi-person" aria-hidden="true"></i> Connexion</a>
+                {% endif %}
+            </div>
+        </nav>
 
-                        </ul>
-                        <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
-                    </nav>
+        <a href="{{ path('app_panier') }}" class="icon-btn cart-btn" aria-label="Panier{% if cartCount > 0 %}, {{ cartCount }} article{{ cartCount > 1 ? 's' }}{% endif %}">
+            <i class="bi bi-bag" aria-hidden="true"></i>
+            {% if cartCount > 0 %}<span class="cart-btn__badge">{{ cartCount }}</span>{% endif %}
+        </a>
 
-                    <a class="cta-btn d-none d-sm-block" href="{{ path('app_panier') }}" title="Mon panier">
-                        <span class="nav-cart-wrap">
-                            <i class="bi bi-cart3"></i>
-                            {% if cartCount > 0 %}
-                                <span class="nav-cart-badge">{{ cartCount }}</span>
-                            {% endif %}
-                        </span>
-                    </a>
+        <button type="button" class="icon-btn nav-toggle" data-nav-target="toggle" data-action="nav#toggle" aria-expanded="false" aria-controls="menu-principal" aria-label="Menu">
+            <span class="nav-toggle__bars" aria-hidden="true"><span></span><span></span><span></span></span>
+        </button>
+    </div>
+    <div class="nav-backdrop" data-action="click->nav#close"></div>
+</header>
 
-                </div>
-            </div><!-- End Branding -->
+<main id="contenu">
+    {% block main %}{% endblock %}
+</main>
 
-        </header>
-
-        <main>
-        {% block main %} {% endblock %}
-        </main>
-        
-        <!-- pied de page-->
-        <footer id="footer" class="footer light-background">
-
-        <div class="container footer-top">
-            <div class="row gy-4">
-                <div class="col-lg-4 col-md-6 footer-about">
-                <a href="{{path('app_home')}}" class="logo d-flex align-items-center">
-                    <span class="sitename">Cabinet Médical</span>
+{# ===== Pied de page ===== #}
+<footer class="site-footer">
+    <div class="container">
+        <div class="site-footer__grid">
+            <div class="site-footer__about">
+                <a href="{{ path('app_home') }}" class="brand brand--light">
+                    {% include 'components/_brand_mark.html.twig' %}
+                    <span class="brand__text">Cabinet <em>Martin</em></span>
                 </a>
-                <div class="footer-contact pt-3">
-                    <p>7, rue des Archives</p>
-                    <p>53 000 Laval</p>
-                    <p class="mt-3"><strong>Phone:</strong> <span>02 99 99 99 99</span></p>
-                    <p><strong>Email:</strong> <span>cabinetmartinonline535@gmail.com</span></p>
-                </div>
-                <div class="social-links d-flex mt-4">
-                    <a href=""><i class="bi bi-twitter-x"></i></a>
-                    <a href=""><i class="bi bi-facebook"></i></a>
-                    <a href=""><i class="bi bi-instagram"></i></a>
-                    <a href=""><i class="bi bi-linkedin"></i></a>
-                </div>
+                <p>Un cabinet médical à taille humaine : rendez-vous en ligne, pharmacie et suivi réunis dans un seul espace.</p>
+                <address>
+                    7, rue des Archives<br>
+                    53 000 Laval<br>
+                    <a href="tel:+33299999999">02 99 99 99 99</a>
+                </address>
             </div>
 
-            <div class="col-lg-2 col-md-4 footer-links">                
+            <nav aria-label="Le cabinet">
+                <h2 class="site-footer__title">Le cabinet</h2>
                 <ul>
-                    <li><a href="{{path('app_home')}}">Home</a></li>
-                    <li><a href="{{path('app_about')}}">About us</a></li>                
-                    <li><a href="{{path('app_politique')}}">Privacy policy</a></li>
-                </ul>
-            </div>
-            <div class="col-lg-2 col-md-4 footer-links">                
-                <ul>
-                    <li><a href="#">Services</a></li>
-                    <li><a href="{{path('app_medecin')}}">Médecins</a></li>                
-                    
-                </ul>
-            </div>
-            <div class="col-lg-2 col-md-4 footer-links">                
-                <ul>
-                    <li><a href="{{ path('app_login') }}">Connexion</a></li>
+                    <li><a href="{{ path('app_about') }}">À propos</a></li>
+                    <li><a href="{{ path('app_medecin') }}">Nos médecins</a></li>
+                    <li><a href="{{ path('app_teleconsultation') }}">Téléconsultation</a></li>
                     <li><a href="{{ path('app_contact') }}">Contact</a></li>
                 </ul>
+            </nav>
+
+            <nav aria-label="Services">
+                <h2 class="site-footer__title">Services</h2>
+                <ul>
+                    <li><a href="{{ path('app_rendez_vous') }}">Prendre rendez-vous</a></li>
+                    <li><a href="{{ path('app_pharmacie') }}">Pharmacie en ligne</a></li>
+                    <li><a href="{{ path('app_panier') }}">Mon panier</a></li>
+                    {% if app.user %}
+                        <li><a href="{{ path('app_profil') }}">Mon espace patient</a></li>
+                    {% else %}
+                        <li><a href="{{ path('app_login') }}">Connexion</a></li>
+                        <li><a href="{{ path('app_inscription') }}">Créer un compte</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+
+            <div>
+                <h2 class="site-footer__title">Horaires</h2>
+                <ul class="site-footer__hours">
+                    <li><span>Lundi – Vendredi</span><span>8h – 18h</span></li>
+                    <li><span>Samedi</span><span>8h – 12h</span></li>
+                    <li><span>Dimanche</span><span>Fermé</span></li>
+                </ul>
+                <p class="site-footer__urgence"><i class="bi bi-exclamation-octagon" aria-hidden="true"></i> Urgence vitale : appelez le 15</p>
             </div>
-
-        </div>
         </div>
 
-        <div class="container copyright text-center mt-4">
-            <p>© <span>Copyright</span> <strong class="px-1 sitename">Cabinet Martin</strong> <span>All Rights Reserved</span></p>
+        <div class="site-footer__demo">
+            <i class="bi bi-info-circle" aria-hidden="true"></i>
+            <p><strong>Projet de démonstration</strong> — ce site est une réalisation de portfolio. Les médecins, produits, commandes et paiements sont fictifs ; aucune donnée bancaire n'est collectée.</p>
         </div>
-    </footer>
 
-    <!-- Scroll Top -->
-    <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
-
-    
-
-
-  <!-- Vendor JS Files -->
-  <script src="{{ asset('/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-  <script src="{{ asset('/vendor/php-email-form/validate.js') }}"></script>
-  <script src="{{ asset('/vendor/aos/aos.js') }}"></script>
-  <script src="{{ asset('/vendor/glightbox/js/glightbox.min.js') }}"></script>
-  <script src="{{ asset('/vendor/purecounter/purecounter_vanilla.js') }}"></script>
-  <script src="{{ asset('/vendor/swiper/swiper-bundle.min.js') }}"></script>
-
-  <!-- Main JS File -->
-  <script src="{{ asset('/js/main.js') }}"></script>
-
-  {% block javascripts %}{% endblock %}
-    </body>
+        <div class="site-footer__bottom">
+            <p>© {{ 'now'|date('Y') }} Cabinet Martin. Tous droits réservés.</p>
+            <a href="{{ path('app_politique') }}">Mentions légales et confidentialité</a>
+        </div>
+    </div>
+</footer>
+</body>
 </html>

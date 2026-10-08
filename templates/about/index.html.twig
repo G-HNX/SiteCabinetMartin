@@ -1,116 +1,110 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}A propos du cabinet Martin!{% endblock %}
+{% block title %}À propos — Cabinet Martin{% endblock %}
 
 {% block main %}
-    {# === About ============================================================== #}
-<section id="about" class="about section">
-  <div class="container">
-    <div class="row gy-4 gx-5">
-      <div class="col-lg-6" >
-        <img src="{{ asset('img/about.jpg') }}" class="img-fluid" alt="Cabinet Martin">
-      </div>
+{% include 'components/_page_head.html.twig' with {
+    eyebrow: 'Le cabinet',
+    title: 'Une médecine claire, efficace et humaine',
+    lead: 'Le Cabinet Martin propose un parcours de soins lisible, de la prévention au suivi des pathologies chroniques.',
+    crumbs: [['À propos', null]]
+} only %}
 
-      <div class="col-lg-6 content" >
-        <h3>À propos du Cabinet</h3>
-        <p>
-          Le Cabinet Martin regroupe deux médecins : le <strong>Dr Martin</strong> (médecine interne) et le <strong>Dr House</strong> (médecine générale).
-          Notre objectif : proposer un parcours de soins clair, efficace et humain, de la prévention au suivi des pathologies chroniques.
-        </p>
-        <ul>
-          <li>
-            <i class="fa-solid fa-vial-circle-check"></i>
-            <div>
-              <h5>Prise en charge globale</h5>
-              <p>De la 1ʳᵉ consultation au suivi spécialisé, nous restons votre point de contact.</p>
+<section class="section">
+    <div class="container">
+        <div class="split">
+            <div class="split__img" data-controller="reveal">
+                <img src="{{ asset('img/about.jpg') }}" alt="L'équipe du Cabinet Martin" loading="lazy" width="1024" height="692">
             </div>
-          </li>
-          <li>
-            <i class="fa-solid fa-pump-medical"></i>
-            <div>
-              <h5>Soins du quotidien</h5>
-              <p>Consultations, renouvellements d’ordonnances, certificats, petites urgences non vitales.</p>
+            <div data-controller="reveal">
+                <p class="eyebrow">Notre approche</p>
+                <h2 class="h1" style="font-size: clamp(1.9rem, 3.6vw, 2.7rem);">À propos du cabinet</h2>
+                <div class="divider-dots"></div>
+                <p>
+                    Fondé par le <strong>Dr Philippe Martin</strong>, médecin généraliste, le cabinet réunit aujourd'hui quatre praticiens :
+                    médecine générale, pédiatrie, cardiologie et dermatologie.
+                    Notre objectif : un parcours de soins clair, efficace et humain, où vous gardez toujours le même point de contact.
+                </p>
+                <ul class="check-list">
+                    <li>
+                        <i class="bi bi-clipboard2-pulse" aria-hidden="true"></i>
+                        <div><h3>Prise en charge globale</h3><p>De la première consultation au suivi spécialisé, nous restons votre point de contact.</p></div>
+                    </li>
+                    <li>
+                        <i class="bi bi-bandaid" aria-hidden="true"></i>
+                        <div><h3>Soins du quotidien</h3><p>Consultations, renouvellements d'ordonnances, certificats, petites urgences non vitales.</p></div>
+                    </li>
+                    <li>
+                        <i class="bi bi-shield-plus" aria-hidden="true"></i>
+                        <div><h3>Prévention et dépistage</h3><p>Bilans, vaccinations et dépistages adaptés à votre âge et à vos facteurs de risque.</p></div>
+                    </li>
+                </ul>
             </div>
-          </li>
-          <li>
-            <i class="fa-solid fa-heart-circle-xmark"></i>
-            <div>
-              <h5>Prévention & dépistage</h5>
-              <p>Bilans, vaccinations, dépistages adaptés à votre âge et à vos facteurs de risque.</p>
-            </div>
-          </li>
-        </ul>
-      </div>
+        </div>
     </div>
-  </div>
 </section>
 
-{# === Stats (peut être commenté si inutile) ============================== #}
-<section id="stats" class="stats section light-background">
-  <div class="container" >
-    <div class="row gy-4">
-      <div class="col-lg-3 col-md-6 d-flex flex-column align-items-center">
-        <i class="fa-solid fa-user-doctor"></i>
-        <div class="stats-item">
-          <span data-purecounter-start="0" data-purecounter-end="2" data-purecounter-duration="1" class="purecounter"></span>
-          <p>Médecins</p>
+<section class="section section--dark" aria-label="Le cabinet en chiffres">
+    <div class="container">
+        <div class="stats">
+            <div class="stat">
+                <span class="stat__value"><span data-controller="counter" data-counter-end-value="2">2</span></span>
+                <p>Médecins</p>
+            </div>
+            <div class="stat">
+                <span class="stat__value"><span data-controller="counter" data-counter-end-value="2">2</span></span>
+                <p>Spécialités</p>
+            </div>
+            <div class="stat">
+                <span class="stat__value"><span data-controller="counter" data-counter-end-value="24">24</span></span>
+                <p>Créneaux par jour</p>
+            </div>
+            <div class="stat">
+                <span class="stat__value"><span data-controller="counter" data-counter-end-value="97">97</span><small>%</small></span>
+                <p>Patients satisfaits</p>
+            </div>
         </div>
-      </div>
-      <div class="col-lg-3 col-md-6 d-flex flex-column align-items-center">
-        <i class="fa-regular fa-hospital"></i>
-        <div class="stats-item">
-          <span data-purecounter-start="0" data-purecounter-end="2" data-purecounter-duration="1" class="purecounter"></span>
-          <p>Spécialités</p>
-        </div>
-      </div>
-      <div class="col-lg-3 col-md-6 d-flex flex-column align-items-center">
-        <i class="fas fa-calendar-check"></i>
-        <div class="stats-item">
-          <span data-purecounter-start="0" data-purecounter-end="24" data-purecounter-duration="1" class="purecounter"></span>
-          <p>Créneaux/jour</p>
-        </div>
-      </div>
-      <div class="col-lg-3 col-md-6 d-flex flex-column align-items-center">
-        <i class="fas fa-star"></i>
-        <div class="stats-item">
-          <span data-purecounter-start="0" data-purecounter-end="97" data-purecounter-duration="1" class="purecounter"></span>
-          <p>% patients satisfaits</p>
-        </div>
-      </div>
     </div>
-  </div>
 </section>
-{% endblock %}
 
-{% block javascripts %}
-<script>
-  (function () {
-    function animateCounter(el) {
-      var target = parseInt(el.dataset.purecounterEnd, 10);
-      var duration = parseFloat(el.dataset.purecounterDuration || 1) * 1000;
-      var start = Date.now();
-      function step() {
-        var progress = Math.min((Date.now() - start) / duration, 1);
-        var eased = 1 - Math.pow(1 - progress, 3);
-        el.textContent = Math.round(eased * target);
-        if (progress < 1) requestAnimationFrame(step);
-      }
-      requestAnimationFrame(step);
-    }
+<section class="section">
+    <div class="container">
+        <div class="section-head section-head--center" data-controller="reveal">
+            <p class="eyebrow">Nos engagements</p>
+            <h2>Ce qui guide notre pratique</h2>
+        </div>
+        <div class="values">
+            <article class="value-card" data-controller="reveal">
+                <i class="bi bi-chat-heart" aria-hidden="true"></i>
+                <h3>Écoute</h3>
+                <p>Le temps nécessaire pour comprendre, expliquer et décider ensemble de la meilleure prise en charge.</p>
+            </article>
+            <article class="value-card" data-controller="reveal">
+                <i class="bi bi-lightning-charge" aria-hidden="true"></i>
+                <h3>Disponibilité</h3>
+                <p>Des créneaux réservables en ligne à toute heure et des délais courts pour la plupart des motifs.</p>
+            </article>
+            <article class="value-card" data-controller="reveal">
+                <i class="bi bi-lock" aria-hidden="true"></i>
+                <h3>Confidentialité</h3>
+                <p>Vos données de santé sont protégées et ne sont partagées qu'avec les professionnels qui vous suivent.</p>
+            </article>
+        </div>
+    </div>
+</section>
 
-    var observer = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (entry.isIntersecting) {
-          animateCounter(entry.target);
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.3 });
-
-    document.querySelectorAll('.purecounter').forEach(function (el) {
-      el.textContent = '0';
-      observer.observe(el);
-    });
-  })();
-</script>
+<section class="section section--sand">
+    <div class="container">
+        <div class="cta-band" data-controller="reveal">
+            <div>
+                <h2>Envie de nous rencontrer ?</h2>
+                <p>Réservez un créneau en ligne en moins d'une minute, ou écrivez-nous pour toute question.</p>
+            </div>
+            <div class="cta-band__btns">
+                <a href="{{ path('app_rendez_vous') }}" class="btn btn-accent btn-lg">Prendre rendez-vous</a>
+                <a href="{{ path('app_contact') }}" class="btn btn-outline-light-c btn-lg">Nous contacter</a>
+            </div>
+        </div>
+    </div>
+</section>
 {% endblock %}

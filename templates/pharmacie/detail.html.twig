@@ -1,94 +1,74 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ product.nom }} — Pharmacie Cabinet Martin{% endblock %}
+{% block title %}{{ product.nom }} — Pharmacie — Cabinet Martin{% endblock %}
+{% block meta_description %}{{ product.nom }} {{ product.forme }} — {{ product.description|striptags|slice(0, 140) }}{% endblock %}
 
 {% block main %}
-<section class="section">
-  <div class="container" data-aos="fade-up">
+<section class="section" style="padding-top: 2rem;">
+    <div class="container">
+        <nav aria-label="Fil d'Ariane">
+            <ol class="breadcrumb-c breadcrumb-c--dark">
+                <li><a href="{{ path('app_home') }}">Accueil</a></li>
+                <li><a href="{{ path('app_pharmacie') }}">Pharmacie</a></li>
+                <li><a href="{{ path('app_pharmacie_cat', {cat: cat}) }}">{{ categorie.nom }}</a></li>
+                <li aria-current="page">{{ product.nom }}</li>
+            </ol>
+        </nav>
 
-    <nav aria-label="breadcrumb" class="mb-4">
-      <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="{{ path('app_pharmacie') }}">Pharmacie</a></li>
-        <li class="breadcrumb-item">
-          <a href="{{ path('app_pharmacie_cat', {cat: cat}) }}">{{ categories[cat-1].nom }}</a>
-        </li>
-        <li class="breadcrumb-item active">{{ product.nom }}</li>
-      </ol>
-    </nav>
-
-    {% for label, messages in app.flashes %}
-      {% for m in messages %}
-        <div class="alert alert-{{ label == 'success' ? 'success' : (label == 'error' ? 'danger' : 'info') }} alert-dismissible fade show">
-          {{ m }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-      {% endfor %}
-    {% endfor %}
-
-    <div class="row g-5">
-
-      <div class="col-md-5 text-center">
-        <img src="{{ asset(product.image) }}" alt="{{ product.nom }}"
-          class="img-fluid rounded shadow" style="max-height: 350px; object-fit: contain;">
-      </div>
-
-      <div class="col-md-7">
-        <span class="badge bg-primary mb-2">{{ categories[cat-1].nom }}</span>
-        <h1 class="fw-bold mb-2">{{ product.nom }}</h1>
-
-        <div class="d-flex align-items-center gap-3 mb-3">
-          <span class="fs-2 fw-bold text-primary">{{ product.prix }} €</span>
-          {% if product.stock > 10 %}
-            <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>En stock</span>
-          {% elseif product.stock > 0 %}
-            <span class="badge bg-warning text-dark"><i class="bi bi-exclamation-circle me-1"></i>Stock faible ({{ product.stock }} restants)</span>
-          {% else %}
-            <span class="badge bg-danger"><i class="bi bi-x-circle me-1"></i>Rupture de stock</span>
-          {% endif %}
-        </div>
-
-        <div class="row g-3 mb-4">
-          <div class="col-6">
-            <div class="card border-0 bg-light p-3 text-center">
-              <small class="text-muted">Forme</small>
-              <strong>{{ product.forme }}</strong>
+        <div class="product-detail">
+            <div class="product-detail__img" data-controller="reveal">
+                <img src="{{ asset(product.image) }}" alt="{{ product.nom }}" width="800" height="640">
             </div>
-          </div>
-          <div class="col-6">
-            <div class="card border-0 bg-light p-3 text-center">
-              <small class="text-muted">Dosage</small>
-              <strong>{{ product.dosage }} mg</strong>
+
+            <div data-controller="reveal">
+                <p class="eyebrow">{{ categorie.nom }}</p>
+                <h1>{{ product.nom }}</h1>
+                <div class="d-flex flex-wrap align-items-center gap-3 mb-3">
+                    <span class="price">{{ product.prix|format_currency('EUR') }}</span>
+                    {% include 'components/_stock_badge.html.twig' with {stock: product.stock} only %}
+                </div>
+
+                {% if product.description %}<p class="text-muted-c">{{ product.description }}</p>{% endif %}
+
+                <ul class="spec-list">
+                    <li><span>Forme</span><strong>{{ product.forme }}</strong></li>
+                    {% if product.dosage %}<li><span>Dosage</span><strong>{{ product.dosage }} mg</strong></li>{% endif %}
+                    <li><span>Catégorie</span><strong>{{ categorie.nom }}</strong></li>
+                </ul>
+
+                <div class="buy-box">
+                    {% if product.stock > 0 %}
+                        <form method="post" action="{{ path('app_panier_add', {id: product.id}) }}" data-controller="submit-lock" data-action="submit->submit-lock#lock" data-submit-lock-label-value="Ajout…">
+                            <input type="hidden" name="_token" value="{{ csrf_token('panier') }}">
+                            <div class="buy-box__row">
+                                <div>
+                                    <label for="quantite" class="visually-hidden-c">Quantité</label>
+                                    <div class="qty">
+                                        <input type="number" id="quantite" name="quantite" value="1" min="1" max="{{ product.stock }}" inputmode="numeric" required>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-lg" data-submit-lock-target="button"><i class="bi bi-bag-plus" aria-hidden="true"></i> Ajouter au panier</button>
+                            </div>
+                        </form>
+                    {% else %}
+                        <button type="button" class="btn btn-primary btn-lg btn-block" disabled><i class="bi bi-x-circle" aria-hidden="true"></i> Rupture de stock</button>
+                        <p class="mt-3 mb-0 text-muted-c">Ce produit n'est pas disponible actuellement. Revenez bientôt ou <a href="{{ path('app_contact') }}">contactez-nous</a>.</p>
+                    {% endif %}
+                </div>
+
+                <ul class="reassure">
+                    <li><i class="bi bi-shield-check" aria-hidden="true"></i>Paiement simulé, aucune donnée bancaire collectée</li>
+                    <li><i class="bi bi-receipt" aria-hidden="true"></i>Facture PDF disponible dans votre espace patient</li>
+                </ul>
+
+                <p class="notice-ordo">
+                    <i class="bi bi-info-circle" aria-hidden="true"></i>
+                    <span>Ce produit est présenté à titre de démonstration. Demandez conseil à votre médecin ou à votre pharmacien.</span>
+                </p>
             </div>
-          </div>
         </div>
 
-        <p class="text-muted mb-4">{{ product.description }}</p>
-
-        {% if product.stock > 0 %}
-          <form method="post" action="{{ path('app_panier_add', {id: product.id}) }}" class="d-flex align-items-center gap-3">
-            <div class="input-group" style="width: 130px;">
-              <span class="input-group-text">Qte</span>
-              <input type="number" name="quantite" value="1" min="1" max="{{ product.stock }}"
-                class="form-control text-center">
-            </div>
-            <button type="submit" class="btn btn-primary btn-lg">
-              <i class="bi bi-cart-plus me-2"></i>Ajouter au panier
-            </button>
-          </form>
-        {% else %}
-          <button class="btn btn-secondary btn-lg" disabled>
-            <i class="bi bi-x-circle me-2"></i>Rupture de stock
-          </button>
-        {% endif %}
-
-      </div>
+        <p class="mt-5"><a href="{{ path('app_pharmacie_cat', {cat: cat}) }}" class="link-arrow"><i class="bi bi-arrow-left" aria-hidden="true"></i> Retour à « {{ categorie.nom }} »</a></p>
     </div>
-
-    <div class="mt-5">
-      <a href="{{ path('app_pharmacie_cat', {cat: cat}) }}" class="btn btn-outline-secondary">
-        <i class="bi bi-arrow-left me-1"></i>Retour a la categorie
-      </a>
-    </div>
-
-  </div>
 </section>
 {% endblock %}

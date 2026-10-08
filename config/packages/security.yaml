@@ -38,6 +38,7 @@ security:
         - { path: ^/profil, roles: ROLE_USER }
         - { path: ^/paiement, roles: ROLE_USER }
         - { path: ^/reserver, roles: ROLE_USER }
+        - { path: ^/validation, roles: ROLE_USER }
         - { path: ^/facture, roles: ROLE_USER }
 when@test:
     security:

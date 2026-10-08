@@ -12,7 +12,7 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class FactureController extends AbstractController
 {
-    #[Route('/facture', name: 'app_facture')]
+    #[Route('/facture', name: 'app_facture', methods: ['GET'])]
     public function index(EntityManagerInterface $em): Response
     {
         $user = $this->getUser();
@@ -30,7 +30,7 @@ final class FactureController extends AbstractController
         ]);
     }
 
-    #[Route('/facture/{id}/pdf', name: 'app_facture_pdf')]
+    #[Route('/facture/{id}/pdf', name: 'app_facture_pdf', requirements: ['id' => '\d+'], methods: ['GET'])]
     public function pdf(int $id, EntityManagerInterface $em): Response
     {
         $user = $this->getUser();

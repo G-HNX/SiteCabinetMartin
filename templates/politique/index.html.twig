@@ -1,220 +1,122 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Politique et Mentions Légales — Cabinet Martin{% endblock %}
+{% block title %}Mentions légales et confidentialité — Cabinet Martin{% endblock %}
 
 {% block main %}
-<style>
-    .legal-container {
-        margin: 2em auto;
-        max-width: 900px;
-        width: 95%;
-        font: 16px/1.6 sans-serif;
-        color: #333;
-    }
+{% include 'components/_page_head.html.twig' with {
+    eyebrow: 'Informations légales',
+    title: 'Politique et mentions légales',
+    lead: 'Éditeur du site, propriété intellectuelle, protection des données et cookies.',
+    crumbs: [['Mentions légales', null]]
+} only %}
 
-    .legal-container h1 {
-        font-size: 2em;
-        margin-bottom: 1.5em;
-        color: #1a1a1a;
-        border-bottom: 3px solid #007bff;
-        padding-bottom: 0.5em;
-    }
+<section class="section">
+    <div class="container">
+        <div class="prose">
+            <p class="notice-ordo" style="margin-top: 0; margin-bottom: 2rem;">
+                <i class="bi bi-info-circle" aria-hidden="true"></i>
+                <span>Ce site est un <strong>projet de démonstration</strong> : les informations d'identification de l'entreprise ci-dessous sont fictives.</span>
+            </p>
 
-    .legal-section {
-        margin-bottom: 2.5em;
-        padding: 1.5em;
-        background-color: #f9f9f9;
-        border-left: 4px solid #007bff;
-        border-radius: 4px;
-    }
+            <ul class="legal-toc" aria-label="Sommaire">
+                <li><a href="#edition">Édition du site</a></li>
+                <li><a href="#propriete">Propriété intellectuelle</a></li>
+                <li><a href="#responsabilite">Responsabilité</a></li>
+                <li><a href="#donnees">Données personnelles</a></li>
+                <li><a href="#cookies">Cookies</a></li>
+                <li><a href="#droit">Droit applicable</a></li>
+            </ul>
 
-    .legal-section h2 {
-        font-size: 1.4em;
-        margin-top: 0;
-        margin-bottom: 1em;
-        color: #0056b3;
-    }
+            <section class="legal-section" id="edition">
+                <h2><span>1</span> Édition du site</h2>
+                <p>
+                    En vertu de l'article 6 de la loi n° 2004-575 du 21 juin 2004 pour la confiance dans l'économie numérique,
+                    il est précisé aux utilisateurs du site l'identité des différents intervenants dans le cadre de sa réalisation et de son suivi.
+                </p>
+                <div class="legal-card">
+                    <strong>Propriétaire du site</strong>
+                    Martin Gabriel — Cabinet Martin<br>
+                    Contact : <a href="mailto:contact@cabinet-martin.fr">contact@cabinet-martin.fr</a><br>
+                    Téléphone : 02 99 99 99 99<br>
+                    Adresse : 7, rue des Archives, 53 000 Laval
+                </div>
+                <div class="legal-card">
+                    <strong>Identification de l'entreprise</strong>
+                    SAS Martin Gabriel — Cabinet Martin<br>
+                    Capital social : 50 000 €<br>
+                    SIREN : 0123 (fictif)<br>
+                    Adresse postale : 7, rue des Archives, 53 000 Laval
+                </div>
+                <div class="legal-card">
+                    <strong>Directeur de la publication</strong>
+                    Cabinet Martin — <a href="mailto:contact@cabinet-martin.fr">contact@cabinet-martin.fr</a>
+                </div>
+                <div class="legal-card">
+                    <strong>Hébergeur</strong>
+                    OVH SAS — 2 rue Kellermann, BP 80157, 59053 Roubaix Cedex 1 — Téléphone : 1007
+                </div>
+                <div class="legal-card">
+                    <strong>Délégué à la protection des données</strong>
+                    Martin Gabriel — <a href="mailto:contact@cabinet-martin.fr">contact@cabinet-martin.fr</a>
+                </div>
+            </section>
 
-    .legal-section p {
-        margin-bottom: 1em;
-        text-align: justify;
-    }
+            <section class="legal-section" id="propriete">
+                <h2><span>2</span> Propriété intellectuelle et contrefaçons</h2>
+                <p>
+                    Martin Gabriel — Cabinet Martin est propriétaire des droits de propriété intellectuelle et détient les droits d'usage
+                    sur tous les éléments accessibles sur le site, notamment les textes, images, graphismes, logos, vidéos, architecture, icônes et sons.
+                </p>
+                <p>
+                    Toute reproduction, représentation, modification, publication ou adaptation de tout ou partie des éléments du site,
+                    quel que soit le moyen ou le procédé utilisé, est interdite, sauf autorisation écrite préalable.
+                </p>
+                <p>
+                    Toute exploitation non autorisée du site ou de l'un quelconque des éléments qu'il contient sera considérée comme constitutive
+                    d'une contrefaçon et poursuivie conformément aux articles L.335-2 et suivants du Code de la propriété intellectuelle.
+                </p>
+            </section>
 
-    .contact-info strong {
-        color: #0056b3;
-        display: block;
-        margin-bottom: 0.3em;
-    }
+            <section class="legal-section" id="responsabilite">
+                <h2><span>3</span> Limitations de responsabilité</h2>
+                <p>Le Cabinet Martin ne pourra être tenu pour responsable des dommages directs et indirects causés au matériel de l'utilisateur lors de l'accès au site.</p>
+                <p>Il décline toute responsabilité quant à l'utilisation qui pourrait être faite des informations et contenus présents sur le site.</p>
+                <p>Le Cabinet Martin s'engage à sécuriser au mieux le site ; sa responsabilité ne pourra toutefois être mise en cause si des données indésirables sont importées et installées à son insu.</p>
+                <p>
+                    Des espaces interactifs (formulaire de contact) sont à la disposition des utilisateurs. Le Cabinet Martin se réserve le droit de supprimer,
+                    sans mise en demeure préalable, tout contenu qui contreviendrait à la législation applicable en France, en particulier aux dispositions relatives à la protection des données.
+                </p>
+                <p>Le cas échéant, il se réserve également la possibilité de mettre en cause la responsabilité civile et/ou pénale de l'utilisateur, notamment en cas de message à caractère raciste, injurieux, diffamant ou pornographique.</p>
+            </section>
 
-    .contact-info a {
-        color: #007bff;
-        text-decoration: none;
-    }
+            <section class="legal-section" id="donnees">
+                <h2><span>4</span> CNIL et gestion des données personnelles</h2>
+                <p>
+                    Conformément à la loi n° 78-17 du 6 janvier 1978 modifiée et au RGPD, l'utilisateur dispose d'un droit d'accès, de rectification
+                    et de suppression des informations collectées. Pour l'exercer, il suffit d'écrire à notre délégué à la protection des données :
+                </p>
+                <div class="legal-card">
+                    <strong>Délégué à la protection des données</strong>
+                    Martin Gabriel — <a href="mailto:contact@cabinet-martin.fr">contact@cabinet-martin.fr</a>
+                </div>
+                <p>Les données saisies (compte, rendez-vous, commandes) servent uniquement au fonctionnement du service. En démonstration, aucune donnée bancaire n'est collectée : le paiement est simulé.</p>
+            </section>
 
-    .contact-info a:hover {
-        text-decoration: underline;
-    }
-</style>
+            <section class="legal-section" id="cookies">
+                <h2><span>5</span> Liens hypertextes et cookies</h2>
+                <p>Le site peut contenir des liens vers d'autres sites ; le Cabinet Martin dégage toute responsabilité à propos de ces liens externes.</p>
+                <p>La navigation est susceptible de provoquer l'installation de cookies sur l'ordinateur de l'utilisateur. Un cookie est un petit fichier qui enregistre des informations relatives à la navigation. Ici, ils servent à maintenir votre session et votre panier.</p>
+                <p>Vous pouvez accepter ou refuser les cookies en modifiant les paramètres de votre navigateur.</p>
+            </section>
 
-<div class="legal-container">
-    <h1>Politique et Mentions Légales</h1>
-
-    <!-- Section 1 : Édition du site -->
-    <section class="legal-section">
-        <h2>1 - Édition du site</h2>
-        <p>
-            En vertu de l'article 6 de la loi n° 2004-575 du 21 juin 2004 pour la confiance dans l'économie numérique, 
-            il est précisé aux utilisateurs du site internet <a href="https://cabinetmartin.com">https://cabinetmartin.com</a> 
-            l'identité des différents intervenants dans le cadre de sa réalisation et de son suivi.
-        </p>
-
-        <div class="contact-info">
-            <strong>Propriétaire du site :</strong>
-            Martin Gabriel Cabinet Martin<br>
-            Contact : <a href="mailto:cabinetmartin535@gmail.com">cabinetmartin535@gmail.com</a><br>
-            Téléphone : 02 99 99 99 99<br>
-            Adresse : 7 rue des archives, 53000 Laval
+            <section class="legal-section" id="droit">
+                <h2><span>6</span> Droit applicable et juridiction</h2>
+                <p>
+                    Tout litige en relation avec l'utilisation du site est soumis au droit français. En dehors des cas où la loi ne le permet pas,
+                    il est fait attribution exclusive de juridiction aux tribunaux compétents de Laval.
+                </p>
+            </section>
         </div>
-
-        <div class="contact-info">
-            <strong>Identification de l'entreprise :</strong>
-            SAS Martin Gabriel Cabinet Martin<br>
-            Capital social : 50 000€<br>
-            SIREN : 0123<br>
-            Adresse postale : 7 rue des archives, 53000 Laval<br>
-            <a href="https://cabinetmartin.com/cgv">Conditions Générales de Vente</a>
-        </div>
-
-        <div class="contact-info">
-            <strong>Directeur de la publication :</strong>
-            Cabinet Martin<br>
-            Contact : <a href="mailto:cabinetmartin535@gmail.com">cabinetmartin535@gmail.com</a>
-        </div>
-
-        <div class="contact-info">
-            <strong>Hébergeur :</strong>
-            OVH SAS<br>
-            2 rue Kellermann<br>
-            BP 80157<br>
-            59053 Roubaix Cedex 1<br>
-            Téléphone : 1007
-        </div>
-
-        <div class="contact-info">
-            <strong>Délégué à la protection des données :</strong>
-            Martin Gabriel<br>
-            <a href="mailto:cabinetmartin535@gmail.com">cabinetmartin535@gmail.com</a>
-        </div>
-    </section>
-
-    <!-- Section 2 : Propriété intellectuelle -->
-    <section class="legal-section">
-        <h2>2 - Propriété intellectuelle et contrefaçons</h2>
-        <p>
-            Martin Gabriel Cabinet Martin est propriétaire des droits de propriété intellectuelle et détient les droits 
-            d'usage sur tous les éléments accessibles sur le site internet, notamment les textes, images, graphismes, 
-            logos, vidéos, architecture, icônes et sons.
-        </p>
-        <p>
-            Toute reproduction, représentation, modification, publication, adaptation de tout ou partie des éléments 
-            du site, quel que soit le moyen ou le procédé utilisé, est interdite, sauf autorisation écrite préalable 
-            de Martin Gabriel Cabinet Martin.
-        </p>
-        <p>
-            Toute exploitation non autorisée du site ou de l'un quelconque des éléments qu'il contient sera considérée 
-            comme constitutive d'une contrefaçon et poursuivie conformément aux dispositions des articles L.335-2 et 
-            suivants du Code de Propriété Intellectuelle.
-        </p>
-    </section>
-
-    <!-- Section 3 : Limitations de responsabilité -->
-    <section class="legal-section">
-        <h2>3 - Limitations de responsabilité</h2>
-        <p>
-            Martin Gabriel Cabinet Martin ne pourra être tenu pour responsable des dommages directs et indirects causés 
-            au matériel de l'utilisateur, lors de l'accès au site <a href="https://cabinetmartin.com">https://cabinetmartin.com</a>.
-        </p>
-        <p>
-            Martin Gabriel Cabinet Martin décline toute responsabilité quant à l'utilisation qui pourrait être faite des 
-            informations et contenus présents sur <a href="https://cabinetmartin.com">https://cabinetmartin.com</a>.
-        </p>
-        <p>
-            Martin Gabriel Cabinet Martin s'engage à sécuriser au mieux le site 
-            <a href="https://cabinetmartin.com">https://cabinetmartin.com</a>, cependant sa responsabilité ne pourra être 
-            mise en cause si des données indésirables sont importées et installées sur son site à son insu.
-        </p>
-        <p>
-            Des espaces interactifs (espace contact ou commentaires) sont à la disposition des utilisateurs. 
-            Martin Gabriel Cabinet Martin se réserve le droit de supprimer, sans mise en demeure préalable, tout contenu 
-            déposé dans cet espace qui contreviendrait à la législation applicable en France, en particulier aux 
-            dispositions relatives à la protection des données.
-        </p>
-        <p>
-            Le cas échéant, Martin Gabriel Cabinet Martin se réserve également la possibilité de mettre en cause la 
-            responsabilité civile et/ou pénale de l'utilisateur, notamment en cas de message à caractère raciste, 
-            injurieux, diffamant, ou pornographique, quel que soit le support utilisé (texte, photographie…).
-        </p>
-    </section>
-
-    <!-- Section 4 : CNIL et gestion des données personnelles -->
-    <section class="legal-section">
-        <h2>4 - CNIL et gestion des données personnelles</h2>
-        <p>
-            Conformément aux dispositions de la loi 78-17 du 6 janvier 1978 modifiée, l'utilisateur du site 
-            <a href="https://cabinetmartin.com">https://cabinetmartin.com</a> dispose d'un droit d'accès, de modification 
-            et de suppression des informations collectées. Pour exercer ce droit, envoyez un message à notre Délégué à la 
-            Protection des Données :
-        </p>
-
-        <div class="contact-info">
-            <strong>Délégué à la Protection des Données :</strong>
-            Martin Gabriel<br>
-            <a href="mailto:cabinetmartin535@gmail.com">cabinetmartin535@gmail.com</a>
-        </div>
-
-        <p>
-            Pour plus d'informations sur la façon dont nous traitons vos données (type de données, finalité, destinataire...), 
-            consultez notre <a href="https://cabinetmartin.com/politique-confidentialité">politique de confidentialité</a>.
-        </p>
-    </section>
-
-    <!-- Section 5 : Liens hypertextes et cookies -->
-    <section class="legal-section">
-        <h2>5 - Liens hypertextes et cookies</h2>
-        <p>
-            Le site <a href="https://cabinetmartin.com">https://cabinetmartin.com</a> contient des liens hypertextes 
-            vers d'autres sites et dégage toute responsabilité à propos de ces liens externes ou des liens créés par 
-            d'autres sites vers <a href="https://cabinetmartin.com">https://cabinetmartin.com</a>.
-        </p>
-        <p>
-            La navigation sur le site <a href="https://cabinetmartin.com">https://cabinetmartin.com</a> est susceptible 
-            de provoquer l'installation de cookie(s) sur l'ordinateur de l'utilisateur.
-        </p>
-        <p>
-            Un « cookie » est un fichier de petite taille qui enregistre des informations relatives à la navigation d'un 
-            utilisateur sur un site. Les données ainsi obtenues permettent d'obtenir des mesures de fréquentation, par exemple.
-        </p>
-        <p>
-            Vous avez la possibilité d'accepter ou de refuser les cookies en modifiant les paramètres de votre navigateur. 
-            Aucun cookie ne sera déposé sans votre consentement.
-        </p>
-        <p>
-            Les cookies sont enregistrés pour une durée maximale de 3 mois.
-        </p>
-        <p>
-            Pour plus d'informations sur la façon dont nous faisons usage des cookies, consultez notre 
-            <a href="https://cabinetmartin.com/politique-confidentialité">politique de confidentialité</a>.
-        </p>
-    </section>
-
-    <!-- Section 6 : Droit applicable et attribution de juridiction -->
-    <section class="legal-section">
-        <h2>6 - Droit applicable et attribution de juridiction</h2>
-        <p>
-            Tout litige en relation avec l'utilisation du site <a href="https://cabinetmartin.com">https://cabinetmartin.com</a> 
-            est soumis au droit français. En dehors des cas où la loi ne le permet pas, il est fait attribution exclusive de 
-            juridiction aux tribunaux compétents de Laval.
-        </p>
-    </section>
-</div>
+    </div>
+</section>
 {% endblock %}

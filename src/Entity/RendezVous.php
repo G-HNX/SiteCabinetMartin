@@ -6,6 +6,7 @@ use App\Repository\RendezVousRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: RendezVousRepository::class)]
+#[ORM\UniqueConstraint(name: 'uniq_rdv_medecin_debut', fields: ['medecin', 'dateDebutRDV'])]
 class RendezVous
 {
     #[ORM\Id]
@@ -13,26 +14,22 @@ class RendezVous
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(nullable: true)]
-    private \DateTimeImmutable $dateDebutRDV ;
+    #[ORM\Column]
+    private \DateTimeImmutable $dateDebutRDV;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column]
     private \DateTimeImmutable $dateFinRDV;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $commentaireRDV = null;
 
-    #[ORM\Column]
-    private ?bool $disponibiliteRDV = null;
-
-   
-
     #[ORM\ManyToOne(inversedBy: 'lesRendezVous')]
     #[ORM\JoinColumn(nullable: false)]
     private Medecin $medecin;
 
-    #[ORM\ManyToOne(inversedBy: 'lesRendezVous')]
-    private ?Patient $patient = null;
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private Patient $patient;
 
     public function getId(): ?int
     {
@@ -75,19 +72,10 @@ class RendezVous
         return $this;
     }
 
-    public function isDisponibiliteRDV(): ?bool
+    public function isAVenir(): bool
     {
-        return $this->disponibiliteRDV;
+        return $this->dateDebutRDV > new \DateTimeImmutable();
     }
-
-    public function setDisponibiliteRDV(bool $disponibiliteRDV): static
-    {
-        $this->disponibiliteRDV = $disponibiliteRDV;
-
-        return $this;
-    }
-
-    
 
     public function getMedecin(): Medecin
     {
@@ -101,12 +89,12 @@ class RendezVous
         return $this;
     }
 
-    public function getPatient(): ?Patient
+    public function getPatient(): Patient
     {
         return $this->patient;
     }
 
-    public function setPatient(?Patient $patient): static
+    public function setPatient(Patient $patient): static
     {
         $this->patient = $patient;
 

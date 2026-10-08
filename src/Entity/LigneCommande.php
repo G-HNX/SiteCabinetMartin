@@ -14,9 +14,6 @@ class LigneCommande
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column]
-    private ?int $qtiteLigneCommande = null;
-
     #[ORM\ManyToOne(inversedBy: 'lignesCommande')]
     private ?Commande $commande = null;
 
@@ -32,18 +29,6 @@ class LigneCommande
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getQtiteLigneCommande(): ?int
-    {
-        return $this->qtiteLigneCommande;
-    }
-
-    public function setQtiteLigneCommande(int $qtiteLigneCommande): static
-    {
-        $this->qtiteLigneCommande = $qtiteLigneCommande;
-
-        return $this;
     }
 
     public function getCommande(): ?Commande
@@ -78,9 +63,13 @@ class LigneCommande
     public function setQuantite(int $quantite): static
     {
         $this->quantite = $quantite;
-        $this->qtiteLigneCommande = $quantite;
 
         return $this;
+    }
+
+    public function getSousTotal(): string
+    {
+        return number_format((float) $this->prix * (int) $this->quantite, 2, '.', '');
     }
 
     public function getPrix(): ?string

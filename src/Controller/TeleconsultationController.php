@@ -8,11 +8,9 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class TeleconsultationController extends AbstractController
 {
-    #[Route('/teleconsultation', name: 'app_teleconsultation')]
+    #[Route('/teleconsultation', name: 'app_teleconsultation', methods: ['GET'])]
     public function index(): Response
     {
-        return $this->render('teleconsultation/index.html.twig', [
-            'controller_name' => 'TeleconsultationController',
-        ]);
+        return $this->render('teleconsultation/index.html.twig');
     }
 }

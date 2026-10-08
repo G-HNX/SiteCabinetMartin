@@ -1,63 +1,53 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Teleconsultation — Cabinet Martin{% endblock %}
+{% block title %}Téléconsultation — Cabinet Martin{% endblock %}
 
 {% block main %}
-<section class="section">
-  <div class="container" data-aos="fade-up">
-
-    <div class="section-title">
-      <h2>Teleconsultation</h2>
-      <p>Consultez un medecin depuis chez vous</p>
-    </div>
-
-    <div class="row justify-content-center">
-      <div class="col-lg-8 text-center">
-
-        <div class="card border-0 shadow-sm p-5 mb-5">
-          <i class="bi bi-camera-video-fill text-primary mb-4" style="font-size: 5rem;"></i>
-          <h3 class="fw-bold mb-3">Bientot disponible</h3>
-          <p class="text-muted mb-4">
-            La teleconsultation video avec nos medecins sera disponible prochainement.
-            En attendant, vous pouvez prendre un rendez-vous en cabinet.
-          </p>
-          <div class="d-flex justify-content-center gap-3 flex-wrap">
-            <a href="{{ path('app_rendez_vous') }}" class="btn btn-primary btn-lg">
-              <i class="bi bi-calendar-plus me-2"></i>Prendre un RDV en cabinet
-            </a>
-            <a href="{{ path('app_contact') }}" class="btn btn-outline-primary btn-lg">
-              <i class="bi bi-envelope me-2"></i>Nous contacter
-            </a>
-          </div>
+<section class="section" style="padding-top: clamp(2.5rem, 6vw, 4.5rem);">
+    <div class="container">
+        <div class="split">
+            <div data-controller="reveal">
+                <span class="soon-badge">Bientôt disponible</span>
+                <h1 style="font-size: clamp(2.2rem, 5vw, 3.5rem);">Consulter un médecin, <em style="color: var(--clay);">depuis chez vous.</em></h1>
+                <p class="hero__lead mt-3">
+                    La téléconsultation vidéo avec nos médecins ouvrira prochainement.
+                    En attendant, réservez un rendez-vous en cabinet, ou écrivez-nous pour toute question.
+                </p>
+                <div class="hero__cta mb-0">
+                    <a href="{{ path('app_rendez_vous') }}" class="btn btn-accent btn-lg"><i class="bi bi-calendar2-plus" aria-hidden="true"></i> Rendez-vous en cabinet</a>
+                    <a href="{{ path('app_contact') }}" class="btn btn-ghost btn-lg"><i class="bi bi-envelope" aria-hidden="true"></i> Nous contacter</a>
+                </div>
+            </div>
+            <div class="split__img" data-controller="reveal">
+                <img src="{{ asset('img/departments-1.jpg') }}" alt="Stéthoscope posé sur un électrocardiogramme" loading="lazy" width="600" height="525">
+            </div>
         </div>
-
-        <div class="row g-4">
-          <div class="col-md-4">
-            <div class="card border-0 shadow-sm p-4 text-center h-100">
-              <i class="bi bi-house-heart text-primary fs-1 mb-3"></i>
-              <h5 class="fw-bold">Depuis chez vous</h5>
-              <p class="text-muted small mb-0">Consultez sans vous deplacer depuis votre ordinateur ou smartphone.</p>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="card border-0 shadow-sm p-4 text-center h-100">
-              <i class="bi bi-clock-history text-primary fs-1 mb-3"></i>
-              <h5 class="fw-bold">Disponible 7j/7</h5>
-              <p class="text-muted small mb-0">Des plages horaires etendues pour vous accommoder a tout moment.</p>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="card border-0 shadow-sm p-4 text-center h-100">
-              <i class="bi bi-shield-check text-primary fs-1 mb-3"></i>
-              <h5 class="fw-bold">Securise</h5>
-              <p class="text-muted small mb-0">Connexion chiffree et confidentialite medicale garanties.</p>
-            </div>
-          </div>
-        </div>
-
-      </div>
     </div>
+</section>
 
-  </div>
+<section class="section section--tint">
+    <div class="container">
+        <div class="section-head section-head--center" data-controller="reveal">
+            <p class="eyebrow">Ce que ça changera</p>
+            <h2>Les avantages de la consultation à distance</h2>
+        </div>
+        <div class="values">
+            <article class="value-card" data-controller="reveal">
+                <i class="bi bi-house-heart" aria-hidden="true"></i>
+                <h3>Depuis chez vous</h3>
+                <p>Consultez sans vous déplacer, depuis votre ordinateur ou votre smartphone.</p>
+            </article>
+            <article class="value-card" data-controller="reveal">
+                <i class="bi bi-clock-history" aria-hidden="true"></i>
+                <h3>Plages étendues</h3>
+                <p>Des horaires élargis pour s'adapter à votre emploi du temps.</p>
+            </article>
+            <article class="value-card" data-controller="reveal">
+                <i class="bi bi-shield-check" aria-hidden="true"></i>
+                <h3>Sécurisé</h3>
+                <p>Connexion chiffrée et confidentialité médicale garanties.</p>
+            </article>
+        </div>
+    </div>
 </section>
 {% endblock %}

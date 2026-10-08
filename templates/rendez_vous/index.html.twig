@@ -1,114 +1,102 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Prendre un rendez-vous — Cabinet Martin{% endblock %}
+{% block title %}Prendre rendez-vous — Cabinet Martin{% endblock %}
 
 {% block main %}
-<section class="section">
-  <div class="container-fluid px-4" data-aos="fade-up">
+{% include 'components/_page_head.html.twig' with {
+    eyebrow: 'Réservation en ligne',
+    title: 'Prendre rendez-vous',
+    lead: 'Choisissez votre médecin, puis le créneau qui vous convient. Votre réservation est confirmée par email.',
+    crumbs: [['Rendez-vous', null]]
+} only %}
 
-    <div class="section-title">
-      <h2>Prendre un rendez-vous</h2>
-      <p>Selectionnez un creneau disponible</p>
-    </div>
 
-    {% for label, messages in app.flashes %}
-      {% for m in messages %}
-        <div class="alert alert-{{ label == 'success' ? 'success' : (label == 'error' ? 'danger' : 'info') }} alert-dismissible fade show">
-          {{ m }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-      {% endfor %}
-    {% endfor %}
+{% set firstDay = calendar|first %}
+{% set lastDay = calendar|last %}
 
-    {% if doctors is empty %}
-      <div class="text-center py-5">
-        <i class="bi bi-person-x text-muted" style="font-size: 5rem;"></i>
-        <h4 class="mt-3 text-muted">Aucun medecin disponible pour le moment</h4>
-      </div>
-    {% else %}
+<section class="section" style="padding-top: 2.5rem;">
+    <div class="container">
 
-      {# Navigation #}
-      <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
-        <div class="d-flex gap-2">
-          <a class="btn btn-outline-secondary {{ offset == 0 ? 'disabled' : '' }}"
-            href="{{ path('app_rendez_vous', { mode: 'move', day: -1 }) }}">
-            <i class="bi bi-chevron-left me-1"></i>Jour precedent
-          </a>
-          <a class="btn btn-outline-primary"
-            href="{{ path('app_rendez_vous', { mode: 'reset', day: 0 }) }}">
-            <i class="bi bi-calendar-today me-1"></i>Aujourd'hui
-          </a>
-          <a class="btn btn-outline-secondary"
-            href="{{ path('app_rendez_vous', { mode: 'move', day: 1 }) }}">
-            Jour suivant<i class="bi bi-chevron-right ms-1"></i>
-          </a>
-        </div>
-        <div class="d-flex flex-wrap gap-2">
-          {% for d in doctors %}
-            <span class="badge bg-primary py-2 px-3">
-              <i class="bi bi-person-badge me-1"></i>{{ d.name }} — {{ d.speciality }}
-            </span>
-          {% endfor %}
-        </div>
-      </div>
-
-      {# Tableau #}
-      {% set jours = { 1: 'Lundi', 2: 'Mardi', 3: 'Mercredi', 4: 'Jeudi', 5: 'Vendredi', 6: 'Samedi', 7: 'Dimanche' } %}
-
-      <div class="table-responsive">
-        <table class="table table-bordered align-top">
-          <thead class="table-primary">
-            <tr>
-              <th style="min-width:160px;">Medecin</th>
-              {% for ymd, col in calendar %}
-                {% set w = ymd|date('N', 'Europe/Paris') %}
-                <th class="text-center" style="min-width:120px;">
-                  <div class="fw-bold">{{ jours[w] }}</div>
-                  <div class="small text-white-50">{{ ymd|date('d/m', 'Europe/Paris') }}</div>
-                </th>
-              {% endfor %}
-            </tr>
-          </thead>
-          <tbody>
-            {% for d in doctors %}
-              <tr>
-                <td class="align-middle">
-                  <div class="fw-bold"><i class="bi bi-person-badge me-1 text-primary"></i>{{ d.name }}</div>
-                  <small class="text-muted">{{ d.speciality }}</small>
-                </td>
-
-                {% for ymd, col in calendar %}
-                  {% set slots = col.slots[d.id] ?? [] %}
-                  <td class="p-2">
-                    {% if slots is empty %}
-                      <span class="text-muted small">Ferme</span>
-                    {% else %}
-                      <div class="d-flex flex-wrap gap-1">
-                        {% for s in slots %}
-                          {% if s.available %}
-                            <a class="btn btn-sm btn-outline-success"
-                              href="{{ path('reservation_new', {'doctor': d.id, 'slot': s.iso}) }}"
-                              title="Disponible">{{ s.time }}</a>
-                          {% else %}
-                            <span class="btn btn-sm btn-outline-secondary disabled"
-                              aria-disabled="true" title="Indisponible">{{ s.time }}</span>
-                          {% endif %}
+        {% if medecins|length == 0 %}
+            <div class="empty-state">
+                <div class="empty-state__icon"><i class="bi bi-calendar2-x" aria-hidden="true"></i></div>
+                <h2>Aucun médecin disponible</h2>
+                <p>La prise de rendez-vous en ligne n'est pas disponible pour le moment. Contactez-nous par téléphone.</p>
+                <a href="{{ path('app_contact') }}" class="btn btn-primary">Nous contacter</a>
+            </div>
+        {% else %}
+            <div data-controller="tabs">
+                {# ----- Étape 1 : médecin ----- #}
+                <h2 class="visually-hidden-c" id="choix-medecin">Choisir un médecin</h2>
+                <div class="doctor-tabs" role="tablist" aria-labelledby="choix-medecin">
+                    {% for m in medecins %}
+                        {% set free = 0 %}
+                        {% for day in calendar %}
+                            {% for s in day.slots[m.id]|default([]) %}{% if s.available %}{% set free = free + 1 %}{% endif %}{% endfor %}
                         {% endfor %}
-                      </div>
-                    {% endif %}
-                  </td>
+                        <button type="button" role="tab" id="tab-{{ m.id }}" class="doctor-tab" data-key="{{ m.id }}"
+                                aria-controls="panel-{{ m.id }}" aria-selected="{{ loop.first ? 'true' : 'false' }}"
+                                data-tabs-target="tab" data-action="tabs#select keydown->tabs#keydown">
+                            <img src="{{ asset(m.photo ?: 'img/doctors/doctors-1.jpg') }}" alt="" width="56" height="56">
+                            <span>
+                                <strong>{{ m.nomComplet }}</strong>
+                                <span>{{ m.specMedecin }}</span>
+                            </span>
+                            <em class="{{ free == 0 ? 'is-none' }}">{{ free }} créneau{{ free > 1 ? 'x' }}</em>
+                        </button>
+                    {% endfor %}
+                </div>
+
+                {# ----- Étape 2 : semaine et créneaux ----- #}
+                <div class="week-nav">
+                    <h2>
+                        {% if firstDay and lastDay %}
+                            Du {{ firstDay.date|format_date(pattern: 'd MMMM') }} au {{ lastDay.date|format_date(pattern: 'd MMMM y') }}
+                        {% else %}
+                            Créneaux disponibles
+                        {% endif %}
+                    </h2>
+                    <div class="week-nav__btns">
+                        <a href="{{ path('app_rendez_vous', {mode: 'move', day: -7}) }}" data-keep-doctor class="btn btn-ghost btn-sm{{ offset == 0 ? ' disabled' }}"{% if offset == 0 %} aria-disabled="true" tabindex="-1"{% endif %}><i class="bi bi-chevron-left" aria-hidden="true"></i> Semaine précédente</a>
+                        <a href="{{ path('app_rendez_vous', {mode: 'reset', day: 0}) }}" data-keep-doctor class="btn btn-ghost btn-sm{{ offset == 0 ? ' disabled' }}"{% if offset == 0 %} aria-disabled="true" tabindex="-1"{% endif %}>Aujourd'hui</a>
+                        <a href="{{ path('app_rendez_vous', {mode: 'move', day: 7}) }}" data-keep-doctor class="btn btn-ghost btn-sm">Semaine suivante <i class="bi bi-chevron-right" aria-hidden="true"></i></a>
+                    </div>
+                </div>
+
+                {% for m in medecins %}
+                    <div class="tabs-panel" role="tabpanel" id="panel-{{ m.id }}" aria-labelledby="tab-{{ m.id }}" data-tabs-target="panel" tabindex="0">
+                        <div class="week">
+                            {% for day in calendar %}
+                                {% set slots = day.slots[m.id]|default([]) %}
+                                {% set freeDay = slots|filter(s => s.available)|length %}
+                                <section class="day" aria-label="{{ day.date|format_date(pattern: 'EEEE d MMMM') }}">
+                                    <header class="day__head">
+                                        <strong>{{ day.date|format_date(pattern: 'EEEE') }}</strong>
+                                        <span>{{ day.date|format_date(pattern: 'd MMM') }}</span>
+                                    </header>
+                                    <div class="day__slots">
+                                        {% for s in slots %}
+                                            {% if s.available %}
+                                                <a class="slot" href="{{ path('reservation_new', {doctor: m.id, slot: s.iso}) }}" aria-label="Réserver le {{ day.date|format_date(pattern: 'EEEE d MMMM') }} à {{ s.time }} avec {{ m.nomComplet }}">{{ s.time }}</a>
+                                            {% else %}
+                                                <span class="slot" aria-disabled="true" title="Créneau indisponible"><span class="visually-hidden-c">Indisponible </span>{{ s.time }}</span>
+                                            {% endif %}
+                                        {% else %}
+                                            <p class="day__empty">Aucun créneau</p>
+                                        {% endfor %}
+                                    </div>
+                                </section>
+                            {% endfor %}
+                        </div>
+                    </div>
                 {% endfor %}
-              </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
 
-      <div class="d-flex gap-3 mt-2 small text-muted">
-        <span><span class="badge bg-outline border border-success text-success">09:00</span> Creneau disponible</span>
-        <span><span class="badge bg-outline border border-secondary text-secondary">09:30</span> Creneau indisponible</span>
-      </div>
-
-    {% endif %}
-  </div>
+                <div class="legend" aria-hidden="true">
+                    <span><i></i> Créneau disponible</span>
+                    <span><i class="off"></i> Indisponible ou passé</span>
+                </div>
+            </div>
+        {% endif %}
+    </div>
 </section>
 {% endblock %}

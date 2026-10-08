@@ -1,98 +1,45 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head><meta charset="UTF-8"></head>
-<body style="margin:0;padding:0;background:#f4f7fb;font-family:Arial,sans-serif;">
+{% extends 'email/_layout.html.twig' %}
 
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f7fb;padding:40px 0;">
-    <tr><td align="center">
-      <table width="600" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 2px 20px rgba(0,0,0,.08);">
+{% block email_title %}Rendez-vous confirmé — Cabinet Martin{% endblock %}
+{% block email_icon %}&#9719;{% endblock %}
+{% block email_heading %}Rendez-vous confirmé{% endblock %}
 
-        <!-- Header -->
+{% block email_body %}
+<p style="margin:0 0 14px 0;">Bonjour <strong>{{ rdv.patient.personne.prenom }} {{ rdv.patient.personne.nom }}</strong>,</p>
+<p style="margin:0 0 24px 0;">Votre rendez-vous au Cabinet Martin a bien été enregistré. Voici le récapitulatif :</p>
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;margin-bottom:24px;border:1px solid #e1ece9;">
+    <tr>
+        <td style="padding:13px 18px;background-color:#f0f7f6;color:#6b7f85;font-size:13px;width:34%;border-bottom:1px solid #e1ece9;">Médecin</td>
+        <td style="padding:13px 18px;background-color:#f0f7f6;font-weight:bold;color:#0a3a45;border-bottom:1px solid #e1ece9;">
+            {{ rdv.medecin.nomComplet }}{% if rdv.medecin.specMedecin %}<br><span style="font-weight:normal;color:#4b6168;font-size:13px;">{{ rdv.medecin.specMedecin }}</span>{% endif %}
+        </td>
+    </tr>
+    <tr>
+        <td style="padding:13px 18px;color:#6b7f85;font-size:13px;border-bottom:1px solid #e1ece9;">Date</td>
+        <td style="padding:13px 18px;font-weight:bold;color:#0a3a45;border-bottom:1px solid #e1ece9;">{{ rdv.dateDebutRDV|format_datetime(pattern: "EEEE d MMMM y")|capitalize }}</td>
+    </tr>
+    <tr>
+        <td style="padding:13px 18px;background-color:#f0f7f6;color:#6b7f85;font-size:13px;border-bottom:1px solid #e1ece9;">Heure</td>
+        <td style="padding:13px 18px;background-color:#f0f7f6;font-weight:bold;color:#0a3a45;border-bottom:1px solid #e1ece9;">{{ rdv.dateDebutRDV|date('H:i') }} – {{ rdv.dateFinRDV|date('H:i') }}</td>
+    </tr>
+    {% if rdv.commentaireRDV %}
         <tr>
-          <td style="background:#1a3c5e;padding:32px 40px;text-align:center;">
-            <h1 style="margin:0;color:#fff;font-size:24px;font-weight:800;">
-              Cabinet <span style="color:#2aa4b5;">Martin</span>
-            </h1>
-            <p style="margin:6px 0 0;color:#b8cfe0;font-size:13px;">7, rue des Archives — 53 000 Laval</p>
-          </td>
+            <td style="padding:13px 18px;color:#6b7f85;font-size:13px;">Motif</td>
+            <td style="padding:13px 18px;color:#12303a;">{{ rdv.commentaireRDV }}</td>
         </tr>
+    {% endif %}
+</table>
 
-        <!-- Bannière -->
-        <tr>
-          <td style="background:#2aa4b5;padding:24px;text-align:center;">
-            <p style="margin:0;color:#fff;font-size:32px;">📅</p>
-            <p style="margin:8px 0 0;color:#fff;font-size:16px;font-weight:bold;">Rendez-vous confirmé</p>
-          </td>
-        </tr>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:22px;">
+    <tr>
+        <td style="background-color:#f6f3ec;border-left:4px solid #e07a5c;padding:14px 18px;font-size:14px;line-height:1.7;color:#0a3a45;">
+            <strong>Cabinet Martin</strong><br>
+            7, rue des Archives — 53 000 Laval<br>
+            02 99 99 99 99
+        </td>
+    </tr>
+</table>
 
-        <!-- Corps -->
-        <tr>
-          <td style="padding:40px;">
-            <p style="margin:0 0 16px;color:#2c2c2c;font-size:15px;line-height:1.6;">
-              Bonjour <strong>{{ rdv.patient.personne.prenom }} {{ rdv.patient.personne.nom }}</strong>,
-            </p>
-            <p style="margin:0 0 28px;color:#2c2c2c;font-size:15px;line-height:1.6;">
-              Votre rendez-vous au Cabinet Martin a bien été enregistré. Voici le récapitulatif :
-            </p>
-
-            <!-- Récap RDV -->
-            <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:28px;border-collapse:collapse;border-radius:8px;overflow:hidden;">
-              <tr style="background:#f4f7fb;border-bottom:1px solid #e8edf3;">
-                <td style="padding:12px 18px;color:#888;font-size:13px;width:40%;">Date</td>
-                <td style="padding:12px 18px;color:#1a3c5e;font-weight:bold;font-size:14px;">
-                  {{ rdv.dateDebutRDV|date('l d MMMM Y')|capitalize }}
-                </td>
-              </tr>
-              <tr style="background:#fff;border-bottom:1px solid #e8edf3;">
-                <td style="padding:12px 18px;color:#888;font-size:13px;">Heure</td>
-                <td style="padding:12px 18px;color:#1a3c5e;font-weight:bold;font-size:14px;">
-                  {{ rdv.dateDebutRDV|date('H:i') }} — {{ rdv.dateFinRDV|date('H:i') }}
-                </td>
-              </tr>
-              <tr style="background:#f4f7fb;border-bottom:1px solid #e8edf3;">
-                <td style="padding:12px 18px;color:#888;font-size:13px;">Médecin</td>
-                <td style="padding:12px 18px;color:#1a3c5e;font-weight:bold;font-size:14px;">
-                  Dr #{{ rdv.medecin.id }}{% if rdv.medecin.specMedecin %} — {{ rdv.medecin.specMedecin }}{% endif %}
-                </td>
-              </tr>
-              {% if rdv.commentaireRDV %}
-              <tr style="background:#fff;">
-                <td style="padding:12px 18px;color:#888;font-size:13px;">Motif</td>
-                <td style="padding:12px 18px;color:#2c2c2c;font-size:14px;">{{ rdv.commentaireRDV }}</td>
-              </tr>
-              {% endif %}
-            </table>
-
-            <!-- Adresse -->
-            <table cellpadding="0" cellspacing="0" style="background:#eef4fb;border-radius:8px;padding:16px 20px;width:100%;margin-bottom:24px;">
-              <tr>
-                <td style="color:#1a3c5e;font-size:13px;line-height:1.8;">
-                  <strong>📍 Cabinet Martin</strong><br>
-                  7, rue des Archives<br>
-                  53 000 Laval<br>
-                  02 99 99 99 99
-                </td>
-              </tr>
-            </table>
-
-            <p style="margin:0;color:#999;font-size:12px;">
-              Pour annuler ou modifier ce rendez-vous, contactez-nous au <strong>02 99 99 99 99</strong> ou par email.
-            </p>
-          </td>
-        </tr>
-
-        <!-- Footer -->
-        <tr>
-          <td style="background:#f4f7fb;padding:24px 40px;text-align:center;border-top:1px solid #eee;">
-            <p style="margin:0;color:#aaa;font-size:11px;">
-              Cabinet Martin &mdash; 02 99 99 99 99 &mdash; cabinetmartinonline535@gmail.com
-            </p>
-          </td>
-        </tr>
-
-      </table>
-    </td></tr>
-  </table>
-
-</body>
-</html>
+<p style="margin:0;font-size:13px;color:#4b6168;">Pour modifier ou annuler ce rendez-vous, contactez-nous au <strong>02 99 99 99 99</strong> ou par email à contact@cabinet-martin.fr.</p>
+{% endblock %}

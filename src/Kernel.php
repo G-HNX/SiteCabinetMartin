@@ -8,4 +8,12 @@ use Symfony\Component\HttpKernel\Kernel as BaseKernel;
 class Kernel extends BaseKernel
 {
     use MicroKernelTrait;
+
+    public function boot(): void
+    {
+        // Les dates (créneaux, commandes) sont stockées sans fuseau : on les manipule en heure de Paris.
+        date_default_timezone_set('Europe/Paris');
+
+        parent::boot();
+    }
 }

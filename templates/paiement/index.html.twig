@@ -3,109 +3,83 @@
 {% block title %}Paiement — Cabinet Martin{% endblock %}
 
 {% block main %}
+{% include 'components/_page_head.html.twig' with {
+    eyebrow: 'Finaliser',
+    title: 'Paiement',
+    crumbs: [['Panier', path('app_panier')], ['Paiement', null]]
+} only %}
+
 <section class="section">
-  <div class="container" data-aos="fade-up">
+    <div class="container">
+        <ol class="steps" aria-label="Étapes de la commande">
+            <li class="is-done"><b><i class="bi bi-check-lg" aria-hidden="true"></i></b> Panier</li>
+            <li class="is-current" aria-current="step"><b>2</b> Paiement</li>
+            <li><b>3</b> Confirmation</li>
+        </ol>
 
-    <div class="section-title">
-      <h2>Paiement</h2>
-      <p>Finalisez votre commande en toute securite</p>
-    </div>
-
-    {% for label, messages in app.flashes %}
-      {% for m in messages %}
-        <div class="alert alert-{{ label == 'success' ? 'success' : (label == 'error' ? 'danger' : 'info') }} alert-dismissible fade show">
-          {{ m }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-      {% endfor %}
-    {% endfor %}
-
-    <div class="row g-4 justify-content-center">
-      <div class="col-lg-6">
-        <div class="card border-0 shadow-sm">
-          <div class="card-header bg-white border-bottom py-3">
-            <h5 class="mb-0 fw-bold"><i class="bi bi-credit-card me-2 text-primary"></i>Informations de paiement</h5>
-          </div>
-          <div class="card-body p-4">
-
-            <form method="post" action="{{ path('app_paiement_payer') }}">
-
-              <div class="mb-3">
-                <label class="form-label fw-semibold">Nom du titulaire</label>
-                <input type="text" name="nom" class="form-control form-control-lg"
-                  placeholder="Jean Martin" required>
-              </div>
-
-              <div class="mb-3">
-                <label class="form-label fw-semibold">Numero de carte</label>
-                <div class="input-group">
-                  <span class="input-group-text"><i class="bi bi-credit-card-2-front"></i></span>
-                  <input type="text" name="numero" class="form-control form-control-lg"
-                    placeholder="0000 0000 0000 0000" maxlength="19" required>
+        <div class="cart-layout">
+            <div>
+                <div class="sim-banner" role="note">
+                    <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
+                    <p><strong>Paiement simulé — aucune donnée bancaire n'est collectée.</strong><br>
+                    Les champs ci-dessous sont factices et ne sont jamais envoyés au serveur. Cliquez simplement sur « Payer ».</p>
                 </div>
-              </div>
 
-              <div class="row g-3 mb-4">
-                <div class="col-7">
-                  <label class="form-label fw-semibold">Date d'expiration</label>
-                  <input type="text" name="expiration" class="form-control form-control-lg"
-                    placeholder="MM/AA" maxlength="5" required>
+                <div class="card-c card-c--pad">
+                    <div class="fake-card" aria-hidden="true">
+                        <div class="fake-card__chip"></div>
+                        <div class="fake-card__num">4242 4242 4242 4242</div>
+                        <div class="fake-card__row"><span>CABINET MARTIN DEMO</span><span>12/30</span></div>
+                    </div>
+
+                    <form method="post" action="{{ path('app_paiement_payer') }}" data-controller="submit-lock" data-action="submit->submit-lock#lock" data-submit-lock-label-value="Paiement en cours…">
+                        <input type="hidden" name="_token" value="{{ csrf_token('paiement') }}">
+
+                        {# Champs factices : volontairement sans attribut name #}
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label for="card-holder" class="form-label">Titulaire de la carte</label>
+                                <input type="text" id="card-holder" class="form-control" value="Patient Démo" disabled>
+                            </div>
+                            <div class="col-12">
+                                <label for="card-number" class="form-label">Numéro de carte</label>
+                                <div class="input-icon">
+                                    <i class="bi bi-credit-card" aria-hidden="true"></i>
+                                    <input type="text" id="card-number" class="form-control" value="4242 4242 4242 4242" disabled>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <label for="card-exp" class="form-label">Expiration</label>
+                                <input type="text" id="card-exp" class="form-control" value="12/30" disabled>
+                            </div>
+                            <div class="col-6">
+                                <label for="card-cvc" class="form-label">Cryptogramme</label>
+                                <input type="text" id="card-cvc" class="form-control" value="123" disabled>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-accent btn-lg btn-block mt-4" data-submit-lock-target="button">
+                            <i class="bi bi-lock" aria-hidden="true"></i> Payer {{ total|format_currency('EUR') }}
+                        </button>
+                        <p class="field-hint text-center mt-3 mb-0"><a href="{{ path('app_panier') }}">Retour au panier</a></p>
+                    </form>
                 </div>
-                <div class="col-5">
-                  <label class="form-label fw-semibold">CVV</label>
-                  <div class="input-group">
-                    <input type="text" name="cvv" class="form-control form-control-lg"
-                      placeholder="123" maxlength="4" required>
-                    <span class="input-group-text" data-bs-toggle="tooltip" title="3 chiffres au dos de votre carte">
-                      <i class="bi bi-question-circle"></i>
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="alert alert-light border d-flex align-items-center gap-2 mb-4">
-                <i class="bi bi-shield-lock-fill text-success fs-5"></i>
-                <small class="text-muted">Paiement securise. Vos donnees bancaires ne sont pas stockees.</small>
-              </div>
-
-              <div class="d-grid">
-                <button class="btn btn-primary btn-lg" type="submit">
-                  <i class="bi bi-lock me-2"></i>Confirmer et payer
-                </button>
-              </div>
-
-            </form>
-          </div>
-        </div>
-      </div>
-
-      {# Recapitulatif commande #}
-      <div class="col-lg-4">
-        <div class="card border-0 shadow-sm">
-          <div class="card-header bg-white border-bottom py-3">
-            <h5 class="mb-0 fw-bold"><i class="bi bi-bag me-2 text-primary"></i>Votre commande</h5>
-          </div>
-          <div class="card-body">
-            {% for item in items %}
-              <div class="d-flex justify-content-between small mb-2">
-                <span class="text-muted">{{ item.nom }} x{{ item.quantite }}</span>
-                <strong>{{ (item.prix * item.quantite)|number_format(2, '.', ',') }} €</strong>
-              </div>
-            {% endfor %}
-            <hr>
-            <div class="d-flex justify-content-between fw-bold">
-              <span>Total</span>
-              <span class="text-primary fs-5">{{ total|number_format(2, '.', ',') }} €</span>
             </div>
-          </div>
-          <div class="card-footer bg-white border-0">
-            <a href="{{ path('app_panier') }}" class="btn btn-sm btn-outline-secondary w-100">
-              <i class="bi bi-arrow-left me-1"></i>Modifier le panier
-            </a>
-          </div>
-        </div>
-      </div>
 
+            <aside class="card-c summary" aria-label="Votre commande">
+                <h2>Votre commande</h2>
+                <ul class="summary__list">
+                    {% for item in items %}
+                        <li><span>{{ item.quantite }} × {{ item.nom }}</span><strong>{{ item.sousTotal|format_currency('EUR') }}</strong></li>
+                    {% endfor %}
+                </ul>
+                <div class="summary__total"><span>Total TTC</span><span class="price">{{ total|format_currency('EUR') }}</span></div>
+                <ul class="reassure">
+                    <li><i class="bi bi-envelope-check" aria-hidden="true"></i>Email de confirmation (Mailpit en démo)</li>
+                    <li><i class="bi bi-receipt" aria-hidden="true"></i>Facture PDF dans votre espace</li>
+                </ul>
+            </aside>
+        </div>
     </div>
-  </div>
 </section>
 {% endblock %}

@@ -1,99 +1,56 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Inscription — Cabinet Martin{% endblock %}
+{% block title %}Créer un compte — Cabinet Martin{% endblock %}
 
 {% block main %}
-<section class="section">
-  <div class="container" data-aos="fade-up">
-    <div class="row justify-content-center">
-      <div class="col-lg-6 col-md-9">
+<div class="auth">
+    <aside class="auth__aside">
+        <div>
+            <p class="eyebrow" style="color: var(--clay-bright);">Nouveau patient</p>
+            <h2>Rejoignez le <em>Cabinet Martin.</em></h2>
+            <p>Un compte gratuit pour réserver vos rendez-vous et commander vos produits de santé en ligne.</p>
+        </div>
+        <ul>
+            <li><i class="bi bi-lightning-charge" aria-hidden="true"></i><p><strong>Rapide</strong>Créez votre compte en moins d'une minute.</p></li>
+            <li><i class="bi bi-envelope-check" aria-hidden="true"></i><p><strong>Vérifié</strong>Un email de confirmation sécurise votre adresse.</p></li>
+            <li><i class="bi bi-shield-lock" aria-hidden="true"></i><p><strong>Confidentiel</strong>Vos données ne sont jamais revendues.</p></li>
+        </ul>
+    </aside>
 
-        <div class="card shadow-sm border-0 mt-5 mb-5">
-          <div class="card-body p-4 p-md-5">
+    <section class="auth__main">
+        <div class="auth__box">
+            <h1>Créer un compte</h1>
+            <p class="lead-sub">Quelques informations suffisent.</p>
 
-            <div class="text-center mb-4">
-              <i class="bi bi-person-plus-fill fs-1 text-primary"></i>
-              <h2 class="mt-2">Creer un compte</h2>
-              <p class="text-muted small">Rejoignez le Cabinet Martin</p>
-            </div>
+            {{ form_start(registrationForm, { attr: { novalidate: 'novalidate', 'data-controller': 'submit-lock', 'data-action': 'submit->submit-lock#lock', 'data-submit-lock-label-value': 'Création…' } }) }}
+                {% if registrationForm.vars.errors|length %}
+                    <div class="form-error-box" role="alert"><i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i><div>{{ form_errors(registrationForm) }}</div></div>
+                {% endif %}
 
-            {% for flash_error in app.flashes('verify_email_error') %}
-              <div class="alert alert-danger d-flex align-items-center gap-2">
-                <i class="bi bi-exclamation-triangle-fill"></i>{{ flash_error }}
-              </div>
-            {% endfor %}
-
-            {{ form_start(registrationForm, { attr: { novalidate: 'novalidate' } }) }}
-
-              <div class="row g-3">
-                <div class="col-md-6">
-                  <label for="{{ registrationForm.nom.vars.id }}" class="form-label fw-semibold">Nom</label>
-                  {{ form_widget(registrationForm.nom, { attr: { class: 'form-control', placeholder: 'Martin' } }) }}
-                  {{ form_errors(registrationForm.nom) }}
+                <div class="row g-3">
+                    <div class="col-sm-6">{{ form_row(registrationForm.prenom, { label: 'Prénom', attr: { autocomplete: 'given-name', placeholder: 'Jean' } }) }}</div>
+                    <div class="col-sm-6">{{ form_row(registrationForm.nom, { label: 'Nom', attr: { autocomplete: 'family-name', placeholder: 'Dupont' } }) }}</div>
+                    <div class="col-12">{{ form_row(registrationForm.telephone, { label: 'Téléphone (facultatif)', attr: { autocomplete: 'tel', placeholder: '06 00 00 00 00' } }) }}</div>
+                    <div class="col-12">{{ form_row(registrationForm.email, { label: 'Adresse email', attr: { autocomplete: 'email', placeholder: 'vous@exemple.fr' } }) }}</div>
+                    <div class="col-12">
+                        {{ form_row(registrationForm.plainPassword, { label: 'Mot de passe', attr: { autocomplete: 'new-password', placeholder: '6 caractères minimum' } }) }}
+                    </div>
+                    <div class="col-12">
+                        <div class="form-check">
+                            {{ form_widget(registrationForm.agreeTerms) }}
+                            <label class="form-check-label" for="{{ registrationForm.agreeTerms.vars.id }}">
+                                J'accepte les <a href="{{ path('app_politique') }}" target="_blank" rel="noopener">conditions d'utilisation</a>
+                            </label>
+                            {{ form_errors(registrationForm.agreeTerms) }}
+                        </div>
+                    </div>
                 </div>
-                <div class="col-md-6">
-                  <label for="{{ registrationForm.prenom.vars.id }}" class="form-label fw-semibold">Prenom</label>
-                  {{ form_widget(registrationForm.prenom, { attr: { class: 'form-control', placeholder: 'Jean' } }) }}
-                  {{ form_errors(registrationForm.prenom) }}
-                </div>
-              </div>
 
-              <div class="mb-3 mt-3">
-                <label for="{{ registrationForm.telephone.vars.id }}" class="form-label fw-semibold">
-                  Telephone <span class="text-muted fw-normal">(optionnel)</span>
-                </label>
-                <div class="input-group">
-                  <span class="input-group-text"><i class="bi bi-telephone"></i></span>
-                  {{ form_widget(registrationForm.telephone, { attr: { class: 'form-control', placeholder: '06 00 00 00 00' } }) }}
-                </div>
-                {{ form_errors(registrationForm.telephone) }}
-              </div>
-
-              <div class="mb-3">
-                <label for="{{ registrationForm.email.vars.id }}" class="form-label fw-semibold">Email</label>
-                <div class="input-group">
-                  <span class="input-group-text"><i class="bi bi-envelope"></i></span>
-                  {{ form_widget(registrationForm.email, { attr: { class: 'form-control', placeholder: 'votre@email.fr' } }) }}
-                </div>
-                {{ form_errors(registrationForm.email) }}
-              </div>
-
-              <div class="mb-4">
-                <label for="{{ registrationForm.plainPassword.vars.id }}" class="form-label fw-semibold">Mot de passe</label>
-                <div class="input-group">
-                  <span class="input-group-text"><i class="bi bi-lock"></i></span>
-                  {{ form_widget(registrationForm.plainPassword, { attr: { class: 'form-control', placeholder: '6 caracteres minimum' } }) }}
-                </div>
-                {{ form_errors(registrationForm.plainPassword) }}
-              </div>
-
-              <div class="mb-4 form-check">
-                {{ form_widget(registrationForm.agreeTerms, { attr: { class: 'form-check-input' } }) }}
-                <label class="form-check-label" for="{{ registrationForm.agreeTerms.vars.id }}">
-                  J'accepte les <a href="{{ path('app_politique') }}" target="_blank">conditions d'utilisation</a>
-                </label>
-                {{ form_errors(registrationForm.agreeTerms) }}
-              </div>
-
-              <div class="d-grid mb-3">
-                <button type="submit" class="btn btn-primary btn-lg">
-                  <i class="bi bi-person-check me-2"></i>Creer mon compte
-                </button>
-              </div>
-
+                <button type="submit" class="btn btn-primary btn-lg btn-block mt-4" data-submit-lock-target="button"><i class="bi bi-person-check" aria-hidden="true"></i> Créer mon compte</button>
             {{ form_end(registrationForm) }}
 
-            <hr>
-            <p class="text-center mb-0 text-muted">
-              Deja inscrit ?
-              <a href="{{ path('app_login') }}" class="text-primary fw-semibold">Se connecter</a>
-            </p>
-
-          </div>
+            <p class="auth__alt">Déjà inscrit ? <a href="{{ path('app_login') }}">Se connecter</a></p>
         </div>
-
-      </div>
-    </div>
-  </div>
-</section>
+    </section>
+</div>
 {% endblock %}

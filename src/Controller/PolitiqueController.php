@@ -8,11 +8,9 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class PolitiqueController extends AbstractController
 {
-    #[Route('/politique', name: 'app_politique')]
+    #[Route('/politique', name: 'app_politique', methods: ['GET'])]
     public function index(): Response
     {
-        return $this->render('politique/index.html.twig', [
-            'controller_name' => 'PolitiqueController',
-        ]);
+        return $this->render('politique/index.html.twig');
     }
 }

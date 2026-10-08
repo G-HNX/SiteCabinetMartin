@@ -7,14 +7,14 @@ use App\Entity\LigneCommande;
 use App\Entity\Medicament;
 use App\Entity\User;
 use App\Service\PanierService;
+use Doctrine\DBAL\LockMode;
 use Doctrine\ORM\EntityManagerInterface;
-use Dompdf\Dompdf;
-use Dompdf\Options;
+use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Component\Mime\Address;
 use Symfony\Component\Routing\Attribute\Route;
 
 final class PaiementController extends AbstractController
@@ -23,93 +23,110 @@ final class PaiementController extends AbstractController
     public function index(PanierService $cart): Response
     {
         $items = $cart->detailed();
-        $total = array_sum(array_map(fn($i) => $i['prix'] * $i['quantite'], $items));
+        if (!$items) {
+            return $this->redirectToRoute('app_panier');
+        }
 
         return $this->render('paiement/index.html.twig', [
             'items' => $items,
-            'total' => $total,
+            'total' => $cart->total($items),
         ]);
     }
 
+    /**
+     * Paiement simulé (démo) : crée la commande, décrémente le stock et vide le panier.
+     */
     #[Route('/paiement/payer', name: 'app_paiement_payer', methods: ['POST'])]
-    public function payer(EntityManagerInterface $entityManager, PanierService $cart, MailerInterface $mailer): Response
-    {
-        // 1. Vérifier si l'utilisateur est connecté
-        /** @var User|null $user */
-        $user = $this->getUser();
-        if (!$user) {
-            return $this->redirectToRoute('app_login');
+    public function payer(
+        Request $request,
+        EntityManagerInterface $entityManager,
+        PanierService $cart,
+        MailerInterface $mailer,
+        LoggerInterface $logger,
+    ): Response {
+        if (!$this->isCsrfTokenValid('paiement', $request->request->getString('_token'))) {
+            $this->addFlash('error', 'Session expirée, veuillez réessayer.');
+
+            return $this->redirectToRoute('app_paiement');
         }
 
+        /** @var User $user */
+        $user = $this->getUser();
         $personne = $user->getPersonne();
-        $patient = $personne->getPatient();
+        if (!$personne) {
+            $this->addFlash('error', 'Votre profil est incomplet, impossible de passer commande.');
 
-        // 2. Récupérer les articles du panier
+            return $this->redirectToRoute('app_profil');
+        }
+
         $items = $cart->getPanier();
-        if (empty($items)) {
+        if (!$items) {
             $this->addFlash('error', 'Votre panier est vide.');
+
             return $this->redirectToRoute('app_panier');
         }
 
-        // 3. Début de transaction
         $entityManager->beginTransaction();
 
         try {
-            // 4. Création de la commande
-            $commande = new Commande();
-            $commande->setDateCommande(new \DateTime());
-            $commande->setPersonne($personne);
+            $commande = (new Commande())
+                ->setDateCommande(new \DateTime())
+                ->setPersonne($personne);
 
-            $entityManager->persist($commande);
+            // Verrous toujours pris dans le même ordre pour éviter les deadlocks entre paiements concurrents
+            ksort($items);
 
-            // 5. Pour chaque article → créer une ligne + décrémenter stock
+            $total = 0.0;
             foreach ($items as $medicamentId => $quantite) {
-                $medicament = $entityManager->getRepository(Medicament::class)->find($medicamentId);
+                // Verrou pessimiste : évite de vendre deux fois le dernier article
+                $medicament = $entityManager->find(Medicament::class, $medicamentId, LockMode::PESSIMISTIC_WRITE);
 
                 if (!$medicament || $medicament->getStock() < $quantite) {
-                    throw new \Exception("Stock insuffisant pour " . ($medicament?->getNom() ?? "#$medicamentId"));
+                    throw new \DomainException(sprintf('Stock insuffisant pour %s.', $medicament?->getNom() ?? 'un produit'));
                 }
 
-                // Ligne commande
-                $ligne = new LigneCommande();
-                $ligne->setCommande($commande);
-                $ligne->setMedicamentLigneCommande($medicament);
-                $ligne->setQuantite($quantite);
-                $ligne->setPrix($medicament->getPrix());
+                $ligne = (new LigneCommande())
+                    ->setMedicamentLigneCommande($medicament)
+                    ->setQuantite($quantite)
+                    ->setPrix($medicament->getPrix());
+                $commande->addLignesCommande($ligne);
 
-                $entityManager->persist($ligne);
-
-                // Décrémentation du stock
                 $medicament->setStock($medicament->getStock() - $quantite);
+                $total += (float) $ligne->getSousTotal();
             }
 
-            // 6. Validation
+            $commande->setTotal(number_format($total, 2, '.', ''));
+            $entityManager->persist($commande);
             $entityManager->flush();
             $entityManager->commit();
+        } catch (\Throwable $e) {
+            $entityManager->rollback();
 
-            // 7. Vider le panier
-            $cart->clear();
-
-            // 8. Email de confirmation
-            try {
-                $email = (new TemplatedEmail())
-                    ->from(new Address('cabinetmartinonline535@gmail.com', 'Cabinet Martin'))
-                    ->to($user->getEmail())
-                    ->subject('Confirmation de votre commande #' . $commande->getId())
-                    ->htmlTemplate('email/commande_confirmation.html.twig')
-                    ->context(['commande' => $commande]);
-                $mailer->send($email);
-            } catch (\Exception) {
-                // L'envoi d'email ne bloque pas la commande
+            if ($e instanceof \DomainException) {
+                $this->addFlash('error', $e->getMessage());
+            } else {
+                $logger->error('Échec du paiement', ['exception' => $e]);
+                $this->addFlash('error', 'Le paiement a échoué, veuillez réessayer.');
             }
 
-            $this->addFlash('success', 'Paiement effectué avec succès !');
-            return $this->redirectToRoute('app_profil');
-
-        } catch (\Exception $e) {
-            $entityManager->rollback();
-            $this->addFlash('error', 'Erreur : ' . $e->getMessage());
             return $this->redirectToRoute('app_panier');
         }
+
+        $cart->clear();
+
+        try {
+            $mailer->send((new TemplatedEmail())
+                ->to((string) $user->getEmail())
+                ->subject('Confirmation de votre commande n°'.$commande->getId())
+                ->htmlTemplate('email/commande_confirmation.html.twig')
+                ->context(['commande' => $commande]));
+        } catch (\Throwable $e) {
+            // L'envoi d'email ne bloque pas la commande
+            $logger->warning('Email de confirmation de commande non envoyé', ['exception' => $e]);
+        }
+
+        $this->addFlash('success', 'Paiement effectué avec succès ! Votre commande n°'.$commande->getId().' est confirmée.');
+
+        return $this->redirectToRoute('app_profil');
     }
 }

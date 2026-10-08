@@ -1,0 +1,19 @@
+{# Paramètres : rdv (RendezVous), past (bool) #}
+<li class="rdv{{ past ? ' rdv--past' }}">
+    <div class="rdv__date" aria-hidden="true">
+        <b>{{ rdv.dateDebutRDV|format_date(pattern: 'd') }}</b>
+        <span>{{ rdv.dateDebutRDV|format_date(pattern: 'MMM') }}</span>
+    </div>
+    <div class="rdv__who">
+        <img src="{{ asset(rdv.medecin.photo ?: 'img/doctors/doctors-1.jpg') }}" alt="" width="46" height="46" loading="lazy">
+        <div>
+            <strong>{{ rdv.medecin.nomComplet }}</strong>
+            <span>{{ rdv.medecin.specMedecin }}</span>
+        </div>
+    </div>
+    <div class="rdv__meta">
+        <span><i class="bi bi-calendar3" aria-hidden="true"></i>{{ rdv.dateDebutRDV|format_datetime(pattern: "EEEE d MMMM y")|capitalize }}</span>
+        <span><i class="bi bi-clock" aria-hidden="true"></i>{{ rdv.dateDebutRDV|date('H:i') }} – {{ rdv.dateFinRDV|date('H:i') }}</span>
+        {% if rdv.commentaireRDV %}<span><i class="bi bi-chat-left-text" aria-hidden="true"></i>{{ rdv.commentaireRDV|length > 60 ? rdv.commentaireRDV|slice(0, 60) ~ '…' : rdv.commentaireRDV }}</span>{% endif %}
+    </div>
+</li>

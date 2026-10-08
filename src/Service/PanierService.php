@@ -5,15 +5,18 @@ namespace App\Service;
 use App\Entity\Medicament;
 use App\Entity\PanierItem;
 use App\Entity\User;
+use App\Repository\MedicamentRepository;
 use App\Repository\PanierItemRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpKernel\Event\RequestEvent;
-use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
 
+/**
+ * Panier hybride : en session pour un visiteur anonyme, en base (PanierItem)
+ * pour un utilisateur connecté. Le panier de session est fusionné à la connexion.
+ */
 final class PanierService implements EventSubscriberInterface
 {
     private const KEY = 'cart_items';
@@ -22,45 +25,25 @@ final class PanierService implements EventSubscriberInterface
         private RequestStack $requestStack,
         private EntityManagerInterface $entityManager,
         private PanierItemRepository $panierItemRepository,
+        private MedicamentRepository $medicamentRepository,
         private TokenStorageInterface $tokenStorage,
     ) {}
 
     public static function getSubscribedEvents(): array
     {
-        return [
-            KernelEvents::REQUEST => 'onRequest',
-            LoginSuccessEvent::class => 'onLoginSuccess',
-        ];
+        return [LoginSuccessEvent::class => 'onLoginSuccess'];
     }
 
-    // -------------------------------------------------
-    // Utilisateur courant (null si non connecte)
-    // -------------------------------------------------
     private function getUser(): ?User
     {
-        $token = $this->tokenStorage->getToken();
-        if (!$token) {
-            return null;
-        }
-        $user = $token->getUser();
+        $user = $this->tokenStorage->getToken()?->getUser();
+
         return $user instanceof User ? $user : null;
     }
 
-    // -------------------------------------------------
-    // Mise a jour du compteur de session a chaque requete
-    // -------------------------------------------------
-    public function onRequest(RequestEvent $event): void
+    private function findItem(User $user, int $medicamentId): ?PanierItem
     {
-        if (!$event->isMainRequest()) {
-            return;
-        }
-
-        $count = 0;
-        foreach ($this->getPanier() as $qty) {
-            $count += (int) $qty;
-        }
-
-        $event->getRequest()->getSession()->set('count', $count);
+        return $this->panierItemRepository->findOneBy(['user' => $user, 'medicament' => $medicamentId]);
     }
 
     // -------------------------------------------------
@@ -69,37 +52,33 @@ final class PanierService implements EventSubscriberInterface
     public function onLoginSuccess(LoginSuccessEvent $event): void
     {
         $user = $event->getUser();
-        if (!$user instanceof User) {
+        $session = $event->getRequest()->getSession();
+        $sessionItems = $session->get(self::KEY, []);
+
+        if (!$user instanceof User || !$sessionItems) {
             return;
         }
 
-        $session = $this->requestStack->getSession();
-        $sessionItems = $session->get(self::KEY, []);
-
         foreach ($sessionItems as $id => $qty) {
-            $medicament = $this->entityManager->getRepository(Medicament::class)->find($id);
+            $medicament = $this->medicamentRepository->find($id);
             if (!$medicament) {
                 continue;
             }
-            $item = $this->panierItemRepository->findOneBy(['user' => $user, 'medicament' => $medicament]);
-            if ($item) {
-                $item->setQuantite($item->getQuantite() + $qty);
-            } else {
-                $item = new PanierItem();
-                $item->setUser($user);
-                $item->setMedicament($medicament);
-                $item->setQuantite($qty);
+            $item = $this->findItem($user, $id);
+            if (!$item) {
+                $item = (new PanierItem())->setUser($user)->setMedicament($medicament);
                 $this->entityManager->persist($item);
             }
+            $item->setQuantite(min($medicament->getStock(), $item->getQuantite() + $qty));
         }
 
         $this->entityManager->flush();
         $session->remove(self::KEY);
     }
 
-    // -------------------------------------------------
-    // Recuperer le panier sous forme [id => quantite]
-    // -------------------------------------------------
+    /**
+     * @return array<int, int> [medicamentId => quantite]
+     */
     public function getPanier(): array
     {
         $user = $this->getUser();
@@ -108,54 +87,47 @@ final class PanierService implements EventSubscriberInterface
             foreach ($this->panierItemRepository->findBy(['user' => $user]) as $item) {
                 $items[$item->getMedicament()->getId()] = $item->getQuantite();
             }
+
             return $items;
         }
 
         return $this->requestStack->getSession()->get(self::KEY, []);
     }
 
-    // -------------------------------------------------
-    // Ajouter un produit
-    // -------------------------------------------------
+    /**
+     * Ajoute un produit, sans dépasser le stock disponible.
+     */
     public function add(int $id, int $qty = 1): void
     {
+        $medicament = $this->medicamentRepository->find($id);
+        if (!$medicament || $medicament->getStock() <= 0) {
+            return;
+        }
+        $qty = max(1, $qty);
+
         $user = $this->getUser();
         if ($user) {
-            $medicament = $this->entityManager->getRepository(Medicament::class)->find($id);
-            if (!$medicament) {
-                return;
-            }
-            $item = $this->panierItemRepository->findOneBy(['user' => $user, 'medicament' => $medicament]);
-            if ($item) {
-                $item->setQuantite($item->getQuantite() + max(1, $qty));
-            } else {
-                $item = new PanierItem();
-                $item->setUser($user);
-                $item->setMedicament($medicament);
-                $item->setQuantite(max(1, $qty));
+            $item = $this->findItem($user, $id);
+            if (!$item) {
+                $item = (new PanierItem())->setUser($user)->setMedicament($medicament);
                 $this->entityManager->persist($item);
             }
+            $item->setQuantite(min($medicament->getStock(), $item->getQuantite() + $qty));
             $this->entityManager->flush();
+
             return;
         }
 
         $items = $this->requestStack->getSession()->get(self::KEY, []);
-        $items[$id] = ($items[$id] ?? 0) + max(1, $qty);
+        $items[$id] = min($medicament->getStock(), ($items[$id] ?? 0) + $qty);
         $this->requestStack->getSession()->set(self::KEY, $items);
     }
 
-    // -------------------------------------------------
-    // Diminuer la quantite
-    // -------------------------------------------------
     public function decrease(int $id, int $step = 1): void
     {
         $user = $this->getUser();
         if ($user) {
-            $medicament = $this->entityManager->getRepository(Medicament::class)->find($id);
-            if (!$medicament) {
-                return;
-            }
-            $item = $this->panierItemRepository->findOneBy(['user' => $user, 'medicament' => $medicament]);
+            $item = $this->findItem($user, $id);
             if ($item) {
                 $newQty = $item->getQuantite() - $step;
                 if ($newQty <= 0) {
@@ -165,6 +137,7 @@ final class PanierService implements EventSubscriberInterface
                 }
                 $this->entityManager->flush();
             }
+
             return;
         }
 
@@ -178,22 +151,16 @@ final class PanierService implements EventSubscriberInterface
         }
     }
 
-    // -------------------------------------------------
-    // Supprimer un produit
-    // -------------------------------------------------
     public function remove(int $id): void
     {
         $user = $this->getUser();
         if ($user) {
-            $medicament = $this->entityManager->getRepository(Medicament::class)->find($id);
-            if (!$medicament) {
-                return;
-            }
-            $item = $this->panierItemRepository->findOneBy(['user' => $user, 'medicament' => $medicament]);
+            $item = $this->findItem($user, $id);
             if ($item) {
                 $this->entityManager->remove($item);
                 $this->entityManager->flush();
             }
+
             return;
         }
 
@@ -202,9 +169,6 @@ final class PanierService implements EventSubscriberInterface
         $this->requestStack->getSession()->set(self::KEY, $items);
     }
 
-    // -------------------------------------------------
-    // Vider le panier
-    // -------------------------------------------------
     public function clear(): void
     {
         $user = $this->getUser();
@@ -213,31 +177,69 @@ final class PanierService implements EventSubscriberInterface
                 $this->entityManager->remove($item);
             }
             $this->entityManager->flush();
+
             return;
         }
 
-        $this->requestStack->getSession()->set(self::KEY, []);
+        $this->requestStack->getSession()->remove(self::KEY);
     }
 
-    // -------------------------------------------------
-    // Details du panier (pour les templates)
-    // -------------------------------------------------
-    public function detailed(): array
+    /**
+     * Nombre total d'articles (badge de la navbar). Ne démarre pas de session
+     * pour un visiteur qui n'en a pas encore.
+     */
+    public function count(): int
     {
-        $result = [];
-        foreach ($this->getPanier() as $id => $quantite) {
-            $medicament = $this->entityManager->getRepository(Medicament::class)->find($id);
-            if ($medicament) {
-                $result[] = [
-                    'id'       => $id,
-                    'nom'      => $medicament->getNom(),
-                    'prix'     => $medicament->getPrix(),
-                    'quantite' => $quantite,
-                    'image'    => $medicament->getImage(),
-                    'stock'    => $medicament->getStock(),
-                ];
+        if (!$this->getUser()) {
+            $request = $this->requestStack->getCurrentRequest();
+            if (!$request?->hasPreviousSession()) {
+                return 0;
             }
         }
+
+        return array_sum($this->getPanier());
+    }
+
+    /**
+     * Détail du panier pour les templates (une seule requête).
+     *
+     * @return list<array{id: int, nom: string, prix: string, quantite: int, image: string, stock: int, sousTotal: string}>
+     */
+    public function detailed(): array
+    {
+        $panier = $this->getPanier();
+        if (!$panier) {
+            return [];
+        }
+
+        $result = [];
+        /** @var Medicament $medicament */
+        foreach ($this->medicamentRepository->findBy(['id' => array_keys($panier)]) as $medicament) {
+            $quantite = $panier[$medicament->getId()];
+            $result[] = [
+                'id' => $medicament->getId(),
+                'nom' => $medicament->getNom(),
+                'prix' => $medicament->getPrix(),
+                'quantite' => $quantite,
+                'image' => $medicament->getImage(),
+                'stock' => $medicament->getStock(),
+                'sousTotal' => number_format((float) $medicament->getPrix() * $quantite, 2, '.', ''),
+            ];
+        }
+
         return $result;
+    }
+
+    /**
+     * @param list<array{sousTotal: string}>|null $items
+     */
+    public function total(?array $items = null): string
+    {
+        $total = 0.0;
+        foreach ($items ?? $this->detailed() as $item) {
+            $total += (float) $item['sousTotal'];
+        }
+
+        return number_format($total, 2, '.', '');
     }
 }

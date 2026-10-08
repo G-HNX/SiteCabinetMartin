@@ -1,67 +1,50 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Confirmer le rendez-vous — Cabinet Martin{% endblock %}
+{% block title %}Confirmer votre rendez-vous — Cabinet Martin{% endblock %}
 
 {% block main %}
-<section class="section">
-  <div class="container" data-aos="fade-up">
-    <div class="row justify-content-center">
-      <div class="col-lg-6 col-md-8">
+{% include 'components/_page_head.html.twig' with {
+    eyebrow: 'Dernière étape',
+    title: 'Confirmer votre rendez-vous',
+    crumbs: [['Rendez-vous', path('app_rendez_vous')], ['Confirmation', null]]
+} only %}
 
-        <div class="section-title">
-          <h2>Confirmer le rendez-vous</h2>
-        </div>
+<section class="section" style="padding-top: 2.5rem;">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-xl-7">
+                <div class="card-c card-c--pad">
+                    <div class="recap">
+                        <div class="recap__doctor">
+                            <img src="{{ asset(doctor.photo ?: 'img/doctors/doctors-1.jpg') }}" alt="" width="72" height="72">
+                            <div>
+                                <h2>{{ doctor.nomComplet }}</h2>
+                                <p>{{ doctor.specMedecin }}</p>
+                            </div>
+                        </div>
+                        <div class="recap__when">
+                            <div><i class="bi bi-calendar3" aria-hidden="true"></i> {{ date|format_datetime(pattern: "EEEE d MMMM y")|capitalize }}</div>
+                            <div><i class="bi bi-clock" aria-hidden="true"></i> {{ date|date('H:i') }} <span class="text-muted-c fw-normal">(30 minutes)</span></div>
+                            <div><i class="bi bi-geo-alt" aria-hidden="true"></i> Cabinet Martin, 7 rue des Archives, Laval</div>
+                        </div>
+                    </div>
 
-        {% for label, messages in app.flashes %}
-          {% for m in messages %}
-            <div class="alert alert-{{ label == 'success' ? 'success' : (label == 'error' ? 'danger' : 'info') }} alert-dismissible fade show">
-              {{ m }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    <form method="post" action="{{ path('reservation_add', {doctor: doctor.id, slot: slot}) }}" data-controller="submit-lock" data-action="submit->submit-lock#lock" data-submit-lock-label-value="Réservation…">
+                        <input type="hidden" name="_token" value="{{ csrf_token('rdv') }}">
+
+                        <label for="motif" class="form-label">Motif de consultation <span class="text-muted-c fw-normal">(facultatif)</span></label>
+                        <textarea id="motif" name="motif" class="form-control" rows="4" maxlength="255" placeholder="Ex. : renouvellement d'ordonnance, douleur persistante, bilan annuel…" aria-describedby="motif-aide"></textarea>
+                        <p id="motif-aide" class="field-hint">255 caractères maximum. Ne communiquez pas d'informations médicales sensibles ici.</p>
+
+                        <div class="d-flex flex-wrap gap-3 mt-4">
+                            <button type="submit" class="btn btn-accent btn-lg" data-submit-lock-target="button"><i class="bi bi-calendar2-check" aria-hidden="true"></i> Confirmer le rendez-vous</button>
+                            <a href="{{ path('app_rendez_vous') }}" class="btn btn-ghost btn-lg">Choisir un autre créneau</a>
+                        </div>
+                    </form>
+                </div>
+                <p class="field-hint text-center mt-3"><i class="bi bi-envelope-check" aria-hidden="true"></i> Un email de confirmation vous sera envoyé (consultable dans Mailpit en démonstration).</p>
             </div>
-          {% endfor %}
-        {% endfor %}
-
-        <div class="card border-0 shadow-sm">
-          <div class="card-body p-4">
-
-            <div class="alert alert-primary d-flex gap-3 align-items-start mb-4">
-              <i class="bi bi-calendar-event-fill fs-4 mt-1"></i>
-              <div>
-                <strong>Medecin :</strong> Dr #{{ doctor }}<br>
-                <strong>Creneau :</strong> {{ slot|replace({'T': ' a '}) }}
-              </div>
-            </div>
-
-            <form id="rdv-form">
-              <div class="mb-4">
-                <label for="motif" class="form-label fw-semibold">Motif de la consultation</label>
-                <textarea id="motif" class="form-control" rows="3"
-                  placeholder="Ex : Consultation generale, renouvellement ordonnance..."></textarea>
-                <div class="form-text">Decrivez brievement la raison de votre visite.</div>
-              </div>
-
-              <div class="d-grid gap-2">
-                <button type="submit" class="btn btn-primary btn-lg">
-                  <i class="bi bi-check-circle me-2"></i>Confirmer le rendez-vous
-                </button>
-                <a href="{{ path('app_rendez_vous') }}" class="btn btn-outline-secondary">
-                  <i class="bi bi-arrow-left me-1"></i>Choisir un autre creneau
-                </a>
-              </div>
-            </form>
-
-          </div>
         </div>
-
-      </div>
     </div>
-  </div>
 </section>
-
-<script>
-document.getElementById('rdv-form').addEventListener('submit', function(e) {
-  e.preventDefault();
-  var motif = document.getElementById('motif').value.trim() || 'consultation';
-  window.location.href = '/validation/{{ doctor }}/{{ slot }}/' + encodeURIComponent(motif);
-});
-</script>
 {% endblock %}

@@ -4,57 +4,50 @@ namespace App\Controller;
 
 use App\Entity\Categorie;
 use App\Entity\Medicament;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\CategorieRepository;
+use App\Repository\MedicamentRepository;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 final class PharmacieController extends AbstractController
 {
-    #[Route('/pharmacie', name: 'app_pharmacie')]
-    public function index(EntityManagerInterface $entityManager): Response
+    #[Route('/pharmacie', name: 'app_pharmacie', methods: ['GET'])]
+    public function index(CategorieRepository $categorieRepository): Response
     {
-        $categories = $entityManager
-            ->getRepository(Categorie::class)
-            ->findAll();
-
         return $this->render('pharmacie/index.html.twig', [
-            'controller_name' => 'PharmacieController',
-            'categories' => $categories
+            'categories' => $categorieRepository->findAll(),
         ]);
     }
 
-    #[Route('/pharmacie/liste/{cat}', name: 'app_pharmacie_cat', requirements: ['cat' => '\d+'])]
-    public function liste(EntityManagerInterface $entityManager, int $cat): Response
+    #[Route('/pharmacie/liste/{cat}', name: 'app_pharmacie_cat', requirements: ['cat' => '\d+'], methods: ['GET'])]
+    public function liste(#[MapEntity(id: 'cat')] Categorie $categorie, CategorieRepository $categorieRepository, MedicamentRepository $medicamentRepository): Response
     {
-        $categorie = $entityManager->getRepository(Categorie::class)->findOneCategorie($cat);
-        $products = $entityManager->getRepository(Medicament::class)->findByCategorie($cat);
-
-        // Si ton template a besoin de toutes les catégories :
-        $categories = $entityManager->getRepository(Categorie::class)->findAll();
-
         return $this->render('pharmacie/produitcat.html.twig', [
-            'controller_name' => 'PharmacieController',
             'categorie' => $categorie,
-            'products' => $products,
-            'categories' => $categories,
-            'cat' => $cat 
+            'products' => $medicamentRepository->findByCategorie($categorie),
+            'categories' => $categorieRepository->findAll(),
+            'cat' => $categorie->getId(),
         ]);
     }
 
-    #[Route('/pharmacie/{cat}/{id}', name: 'app_pharmacie_medicament', requirements: ['cat' => '\d+', 'id' => '\d+'])]
-    public function detail(EntityManagerInterface $entityManager, int $cat, int $id): Response
+    #[Route('/pharmacie/{cat}/{id}', name: 'app_pharmacie_medicament', requirements: ['cat' => '\d+', 'id' => '\d+'], methods: ['GET'])]
+    public function detail(int $cat, #[MapEntity(id: 'id')] Medicament $product, CategorieRepository $categorieRepository): Response
     {
-        $categorie = $entityManager->getRepository(Categorie::class)->findOneCategorie($cat);
-        $product = $entityManager->getRepository(Medicament::class)->findOneMedicament($id);
-        $categories = $entityManager->getRepository(Categorie::class)->findAll();
+        // L'URL doit correspondre à la catégorie réelle du produit
+        if ($product->getCategorie()?->getId() !== $cat) {
+            return $this->redirectToRoute('app_pharmacie_medicament', [
+                'cat' => $product->getCategorie()?->getId(),
+                'id' => $product->getId(),
+            ], Response::HTTP_MOVED_PERMANENTLY);
+        }
 
         return $this->render('pharmacie/detail.html.twig', [
-            'controller_name' => 'PharmacieController',
-            'categorie' => $categorie,
+            'categorie' => $product->getCategorie(),
             'product' => $product,
-            'categories' => $categories,
-            'cat' => $cat
+            'categories' => $categorieRepository->findAll(),
+            'cat' => $cat,
         ]);
     }
 }

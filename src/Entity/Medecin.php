@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\MedecinRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: MedecinRepository::class)]
@@ -20,6 +21,12 @@ class Medecin
 
     #[ORM\Column(length: 200, nullable: true)]
     private ?string $specMedecin = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $photo = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $description = null;
 
     /**
      * @var Collection<int, RendezVous>
@@ -83,16 +90,35 @@ class Medecin
         return $this;
     }
 
-    public function removeLesRendezVou(RendezVous $lesRendezVou): static
+    public function getPhoto(): ?string
     {
-        if ($this->lesRendezVous->removeElement($lesRendezVou)) {
-            // set the owning side to null (unless already changed)
-            if ($lesRendezVou->getMedecin() === $this) {
-                $lesRendezVou->setMedecin(null);
-            }
-        }
+        return $this->photo;
+    }
+
+    public function setPhoto(?string $photo): static
+    {
+        $this->photo = $photo;
 
         return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(?string $description): static
+    {
+        $this->description = $description;
+
+        return $this;
+    }
+
+    public function getNomComplet(): string
+    {
+        $p = $this->personneMedecin;
+
+        return trim('Dr '.$p?->getPrenom().' '.$p?->getNom());
     }
 
     public function getPersonneMedecin(): ?Personne

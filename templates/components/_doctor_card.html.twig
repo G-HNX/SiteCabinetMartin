@@ -1,0 +1,18 @@
+{# Paramètre : m (Medecin) #}
+<article class="doctor-card" data-controller="reveal">
+    <div class="doctor-card__photo">
+        <img src="{{ asset(m.photo ?: 'img/doctors/doctors-1.jpg') }}" alt="Portrait du {{ m.nomComplet }}" loading="lazy" width="600" height="510">
+        <span class="doctor-card__tag">{{ m.specMedecin }}</span>
+    </div>
+    <div class="doctor-card__body">
+        <h3>{{ m.nomComplet }}</h3>
+        {% if m.description %}<p>{{ m.description }}</p>{% endif %}
+        <div class="doctor-card__meta">
+            {% if m.personneMedecin and m.personneMedecin.telephone %}
+                <span><i class="bi bi-telephone" aria-hidden="true"></i>{{ m.personneMedecin.telephone }}</span>
+            {% endif %}
+            <span><i class="bi bi-geo-alt" aria-hidden="true"></i>Laval</span>
+        </div>
+        <a href="{{ path('app_rendez_vous') }}?doctor={{ m.id }}" class="btn btn-primary"><i class="bi bi-calendar2-plus" aria-hidden="true"></i> Prendre rendez-vous</a>
+    </div>
+</article>

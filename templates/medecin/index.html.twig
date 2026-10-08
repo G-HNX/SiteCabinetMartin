@@ -1,51 +1,37 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Nos médécins{% endblock %}
+{% block title %}Nos médecins — Cabinet Martin{% endblock %}
 
 {% block main %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+{% include 'components/_page_head.html.twig' with {
+    eyebrow: 'Votre équipe',
+    title: 'Nos médecins',
+    lead: 'Deux praticiens complémentaires, à votre écoute pour un suivi global et personnalisé.',
+    crumbs: [['Médecins', null]]
+} only %}
 
-<div class="example-wrapper">
-    <h1>Nos médecins</h1>
-
-    
-{# === Doctors ============================================================ #}
-<section id="doctors" class="doctors section">
-  <div class="container section-title" >
-    <h2>Équipe médicale</h2>
-    <p>Des compétences complémentaires pour une prise en charge globale.</p>
-  </div>
-
-  <div class="container">
-    <div class="row gy-4">
-
-      <div class="col-lg-6" >
-        <div class="team-member d-flex align-items-start">
-          <div class="pic"><img src="{{ asset('img/doctors/doctors-1.jpg') }}" class="img-fluid" alt="Dr Martin"></div>
-          <div class="member-info">
-            <h4>Dr Martin</h4>
-            <span>Médecine interne</span>
-            <p>Suivi des maladies chroniques, diagnostics complexes, coordination pluridisciplinaire.</p>
-          </div>
+<section class="section">
+    <div class="container">
+        <div class="doctors">
+            {% for m in medecins %}
+                {% include 'components/_doctor_card.html.twig' with {m: m} only %}
+            {% else %}
+                <div class="empty-inline" style="grid-column: 1 / -1;">
+                    <i class="bi bi-person-badge" aria-hidden="true"></i>
+                    <p>Aucun médecin n'est référencé pour le moment.</p>
+                </div>
+            {% endfor %}
         </div>
-      </div>
 
-      <div class="col-lg-6" >
-        <div class="team-member d-flex align-items-start">
-          <div class="pic"><img src="{{ asset('img/doctors/doctors-3.jpg') }}" class="img-fluid" alt="Dr House"></div>
-          <div class="member-info">
-            <h4>Dr House</h4>
-            <span>Médecine générale</span>
-            <p>Consultations du quotidien, prévention, orientation et suivi des traitements.</p>
-          </div>
+        <div class="cta-band mt-5" data-controller="reveal">
+            <div>
+                <h2>Un créneau vous attend</h2>
+                <p>Choisissez votre médecin et réservez en ligne, sans appel ni file d'attente.</p>
+            </div>
+            <div class="cta-band__btns">
+                <a href="{{ path('app_rendez_vous') }}" class="btn btn-accent btn-lg"><i class="bi bi-calendar2-check" aria-hidden="true"></i> Voir les disponibilités</a>
+            </div>
         </div>
-      </div>
-
     </div>
-  </div>
 </section>
-</div>
 {% endblock %}

@@ -3,100 +3,51 @@
 {% block title %}Nous contacter — Cabinet Martin{% endblock %}
 
 {% block main %}
+{% include 'components/_page_head.html.twig' with {
+    eyebrow: 'Contact',
+    title: 'Nous contacter',
+    lead: 'Une question, une demande de renseignements ? Écrivez-nous, nous vous répondons rapidement.',
+    crumbs: [['Contact', null]]
+} only %}
+
 <section class="section">
-  <div class="container" data-aos="fade-up">
+    <div class="container">
+        <div class="contact-grid">
+            <aside class="contact-info" data-controller="reveal">
+                <h2>Nos coordonnées</h2>
+                <ul>
+                    <li><i class="bi bi-geo-alt" aria-hidden="true"></i><div><strong>Adresse</strong><p>7, rue des Archives<br>53 000 Laval</p></div></li>
+                    <li><i class="bi bi-telephone" aria-hidden="true"></i><div><strong>Téléphone</strong><p><a href="tel:+33299999999">02 99 99 99 99</a></p></div></li>
+                    <li><i class="bi bi-envelope" aria-hidden="true"></i><div><strong>Email</strong><p><a href="mailto:contact@cabinet-martin.fr">contact@cabinet-martin.fr</a></p></div></li>
+                    <li><i class="bi bi-clock" aria-hidden="true"></i><div><strong>Horaires</strong><p>Lundi – Vendredi : 8h00 – 18h00<br>Samedi : 8h00 – 12h00</p></div></li>
+                </ul>
+            </aside>
 
-    <div class="section-title">
-      <h2>Nous contacter</h2>
-      <p>Une question ? Un message ? Nous vous repondons rapidement.</p>
+            <div class="card-c card-c--pad" data-controller="reveal">
+                <h2 style="font-size: 1.7rem;">Envoyez-nous un message</h2>
+                <p class="text-muted-c mb-4">Tous les champs sont obligatoires. Pour une urgence, appelez le 15.</p>
+
+                {{ form_start(contactForm, { attr: { novalidate: 'novalidate', 'data-controller': 'submit-lock', 'data-action': 'submit->submit-lock#lock', 'data-submit-lock-label-value': 'Envoi en cours…' } }) }}
+                    {% if contactForm.vars.errors|length %}
+                        <div class="form-error-box" role="alert"><i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i><div>{{ form_errors(contactForm) }}</div></div>
+                    {% endif %}
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            {{ form_row(contactForm.nomContact, { label: 'Votre nom', attr: { placeholder: 'Jean Dupont', autocomplete: 'name' } }) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form_row(contactForm.emailContact, { label: 'Votre adresse email', attr: { placeholder: 'vous@exemple.fr', autocomplete: 'email' } }) }}
+                        </div>
+                        <div class="col-12">
+                            {{ form_row(contactForm.motifContact, { label: 'Votre message', attr: { rows: 6, placeholder: 'Décrivez votre demande…' } }) }}
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-lg mt-4" data-submit-lock-target="button"><i class="bi bi-send" aria-hidden="true"></i> Envoyer le message</button>
+                {{ form_end(contactForm) }}
+            </div>
+        </div>
     </div>
-
-    {% for label, messages in app.flashes %}
-      {% for m in messages %}
-        <div class="alert alert-{{ label == 'success' ? 'success' : (label == 'error' ? 'danger' : 'info') }} alert-dismissible fade show d-flex align-items-center gap-2">
-          <i class="bi bi-{{ label == 'success' ? 'check-circle-fill' : 'exclamation-triangle-fill' }}"></i>
-          {{ m }}<button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
-        </div>
-      {% endfor %}
-    {% endfor %}
-
-    <div class="row g-5">
-
-      {# Informations de contact #}
-      <div class="col-lg-5">
-        <div class="card border-0 shadow-sm h-100 p-4">
-          <h4 class="fw-bold mb-4">Nos coordonnees</h4>
-
-          <div class="d-flex gap-3 mb-4">
-            <div class="text-primary fs-4"><i class="bi bi-geo-alt-fill"></i></div>
-            <div>
-              <strong>Adresse</strong>
-              <p class="text-muted mb-0">7, rue des Archives<br>53 000 Laval</p>
-            </div>
-          </div>
-
-          <div class="d-flex gap-3 mb-4">
-            <div class="text-primary fs-4"><i class="bi bi-telephone-fill"></i></div>
-            <div>
-              <strong>Telephone</strong>
-              <p class="text-muted mb-0">02 99 99 99 99</p>
-            </div>
-          </div>
-
-          <div class="d-flex gap-3 mb-4">
-            <div class="text-primary fs-4"><i class="bi bi-envelope-fill"></i></div>
-            <div>
-              <strong>Email</strong>
-              <p class="text-muted mb-0">cabinetmartinonline535@gmail.com</p>
-            </div>
-          </div>
-
-          <div class="d-flex gap-3">
-            <div class="text-primary fs-4"><i class="bi bi-clock-fill"></i></div>
-            <div>
-              <strong>Horaires</strong>
-              <p class="text-muted mb-0">Lundi — Vendredi : 8h00 — 18h00<br>Samedi : 8h00 — 12h00</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {# Formulaire #}
-      <div class="col-lg-7">
-        <div class="card border-0 shadow-sm p-4">
-          <h4 class="fw-bold mb-4">Envoyez-nous un message</h4>
-
-          {{ form_start(contactForm, { attr: { novalidate: 'novalidate' } }) }}
-
-            <div class="mb-3">
-              <label for="{{ contactForm.nomContact.vars.id }}" class="form-label fw-semibold">Votre nom</label>
-              {{ form_widget(contactForm.nomContact, { attr: { class: 'form-control', placeholder: 'Jean Martin' } }) }}
-              {{ form_errors(contactForm.nomContact) }}
-            </div>
-
-            <div class="mb-3">
-              <label for="{{ contactForm.emailContact.vars.id }}" class="form-label fw-semibold">Votre email</label>
-              {{ form_widget(contactForm.emailContact, { attr: { class: 'form-control', placeholder: 'votre@email.fr' } }) }}
-              {{ form_errors(contactForm.emailContact) }}
-            </div>
-
-            <div class="mb-4">
-              <label for="{{ contactForm.motifContact.vars.id }}" class="form-label fw-semibold">Votre message</label>
-              {{ form_widget(contactForm.motifContact, { attr: { class: 'form-control', rows: 5, placeholder: 'Decrivez votre demande...' } }) }}
-              {{ form_errors(contactForm.motifContact) }}
-            </div>
-
-            <div class="d-grid">
-              <button type="submit" class="btn btn-primary btn-lg">
-                <i class="bi bi-send me-2"></i>Envoyer le message
-              </button>
-            </div>
-
-          {{ form_end(contactForm) }}
-        </div>
-      </div>
-
-    </div>
-  </div>
 </section>
 {% endblock %}

@@ -1,0 +1,16 @@
+{# Paramètres : p (Medicament), cat (id de la catégorie) #}
+<a href="{{ path('app_pharmacie_medicament', {cat: cat, id: p.id}) }}" class="product-card{{ p.stock <= 0 ? ' is-out' }}">
+    <div class="product-card__img">
+        <img src="{{ asset(p.image) }}" alt="{{ p.nom }}" loading="lazy" width="400" height="300">
+        {% include 'components/_stock_badge.html.twig' with {stock: p.stock} only %}
+    </div>
+    <div class="product-card__body">
+        {% if p.categorie %}<span class="product-card__cat">{{ p.categorie.nom }}</span>{% endif %}
+        <h3>{{ p.nom }}</h3>
+        <span class="product-card__form">{{ p.forme }}{% if p.dosage %} · {{ p.dosage }} mg{% endif %}</span>
+        <div class="product-card__foot">
+            <span class="price">{{ p.prix|format_currency('EUR') }}</span>
+            <span class="product-card__go" aria-hidden="true"><i class="bi bi-arrow-right"></i></span>
+        </div>
+    </div>
+</a>

@@ -1,261 +1,197 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Home - Cabinet Martin{% endblock %}
+{% block title %}Cabinet Martin — Médecins et pharmacie en ligne à Laval{% endblock %}
 
 {% block main %}
- <style>
-    .main { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif;}    
-</style>
+{# ===== Hero ===== #}
+<section class="hero">
+    <div class="container">
+        <div class="hero__grid">
+            <div>
+                <p class="eyebrow">Cabinet médical · Laval</p>
+                <h1>Prenez soin de vous, <em>sans attendre.</em></h1>
+                <p class="hero__lead">
+                    Quatre praticiens à votre écoute, un rendez-vous en quelques clics et une pharmacie en ligne :
+                    tout votre parcours de soins réuni dans un seul espace, simple et sécurisé.
+                </p>
+                <div class="hero__cta">
+                    <a href="{{ path('app_rendez_vous') }}" class="btn btn-accent btn-lg"><i class="bi bi-calendar2-check" aria-hidden="true"></i> Prendre rendez-vous</a>
+                    <a href="{{ path('app_medecin') }}" class="btn btn-ghost btn-lg">Découvrir nos médecins</a>
+                </div>
+                <div class="hero__proof">
+                    <div><i class="bi bi-clock-history" aria-hidden="true"></i> Créneaux sous quelques jours</div>
+                    <div><i class="bi bi-shield-check" aria-hidden="true"></i> Données de santé protégées</div>
+                    <div><i class="bi bi-capsule" aria-hidden="true"></i> Pharmacie intégrée</div>
+                </div>
+            </div>
 
-
- <section id="hero" class="hero section light-background">
-  <img src="{{ asset('/img/hero-bg.jpg') }}" alt="Cabinet médical Martin" >
-
-  <div class="container position-relative">
-    <div class="welcome" >
-      <h2>Bienvenue au Cabinet Martin</h2>
-      <p>Deux médecins complémentaires pour un suivi global : <strong>médecine interne</strong> et <strong>médecine générale</strong>.</p>
+            <div class="hero__visual">
+                <div class="hero__ring" aria-hidden="true"></div>
+                <div class="hero__arch">
+                    <img src="{{ asset('img/about.jpg') }}" alt="L'équipe médicale du Cabinet Martin" width="1024" height="692" fetchpriority="high">
+                </div>
+                <div class="float-card float-card--a">
+                    <i class="bi bi-calendar2-heart" aria-hidden="true"></i>
+                    <div><strong>Rendez-vous en ligne</strong><span>Réservez 24 h/24, 7 j/7</span></div>
+                </div>
+                <div class="float-card float-card--b">
+                    <i class="bi bi-heart-pulse" aria-hidden="true"></i>
+                    <div><strong>Suivi personnalisé</strong><span>Un dossier, un interlocuteur</span></div>
+                </div>
+            </div>
+        </div>
     </div>
-
-    <div class="content row gy-4">
-      <div class="col-lg-4 d-flex align-items-stretch">
-        <div class="why-box" >
-          <h3>Pourquoi nous choisir ?</h3>
-          <p>
-            <strong>Dr Martin (médecine interne)</strong> : prise en charge des maladies chroniques, diagnostics complexes, coordination des spécialistes.<br>
-            <strong>Dr House (médecine générale)</strong> : soins du quotidien, prévention, petites urgences non vitales.<br>
-            Disponibilités rapides, dossier médical suivi et communication claire.
-          </p>
-        <div class="text-center">
-          <a href="{{ path('app_about') }}" class="btn btn-primary">En savoir plus <i class="bi bi-chevron-right"></i></a>
-        </div>
-        </div>
-      </div>
-
-      <div class="col-lg-8 d-flex align-items-stretch">
-        <div class="d-flex flex-column justify-content-center">
-          <div class="row gy-4">
-            <div class="col-xl-6 d-flex align-items-stretch">
-              <div class="icon-box" >
-                <i class="bi bi-clipboard2-pulse"></i>
-                <h4>Suivi personnalisé</h4>
-                <p>Bilan complet, plan de soins adapté, éducation thérapeutique et objectifs mesurables.</p>
-              </div>
-            </div>
-            <div class="col-xl-6 d-flex align-items-stretch">
-              <div class="icon-box" >
-                <i class="bi bi-shield-check"></i>
-                <h4>Prévention & dépistage</h4>
-                <p>Vaccins, dépistages, conseils hygiène de vie et programmes de prévention.</p>
-              </div>
-            </div>
-            <div class="col-xl-6 d-flex align-items-stretch">
-              <div class="icon-box" >
-                <i class="bi bi-people"></i>
-                <h4>Coordination des soins</h4>
-                <p>Échanges rapides avec les spécialistes et comptes rendus accessibles.</p>
-              </div>
-            </div>
-            <div class="col-xl-6 d-flex align-items-stretch">
-              <div class="icon-box" >
-                <i class="bi bi-prescription"></i>
-                <h4>Pharmacie</h4>
-                <p>Achat de médicaments.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
 </section>
 
-
-
-
-<section id="services" class="services section">
-  <div class="container section-title">
-    <h2>Nos services</h2>
-    <p>Un accompagnement complet : prévention, diagnostic, traitement et suivi.</p>
-  </div>
-
-  <div class="container">
-    <div class="row gy-4">
-      <div class="col-lg-6 col-md-12" >
-        <div class="service-item position-relative">
-          <div class="icon"><i class="fas fa-stethoscope"></i></div>
-          <h3>Consultations de médecine générale</h3>
-          <p>Suivi adulte et enfant, certificats, renouvellements, conseils de prévention.</p>
+{# ===== Accès rapides ===== #}
+<section class="quick" aria-label="Accès rapides">
+    <div class="container">
+        <div class="quick__grid">
+            <a href="{{ path('app_rendez_vous') }}" class="quick-card">
+                <span class="quick-card__icon"><i class="bi bi-calendar2-week" aria-hidden="true"></i></span>
+                <div><h3>Prendre rendez-vous</h3><p>Choisissez votre médecin et un créneau</p></div>
+                <i class="bi bi-arrow-right" aria-hidden="true"></i>
+            </a>
+            <a href="{{ path('app_pharmacie') }}" class="quick-card">
+                <span class="quick-card__icon"><i class="bi bi-capsule-pill" aria-hidden="true"></i></span>
+                <div><h3>Pharmacie en ligne</h3><p>Vos produits de santé au quotidien</p></div>
+                <i class="bi bi-arrow-right" aria-hidden="true"></i>
+            </a>
+            <a href="{{ path('app_teleconsultation') }}" class="quick-card">
+                <span class="quick-card__icon"><i class="bi bi-camera-video" aria-hidden="true"></i></span>
+                <div><h3>Téléconsultation</h3><p>Consulter depuis chez vous, bientôt</p></div>
+                <i class="bi bi-arrow-right" aria-hidden="true"></i>
+            </a>
         </div>
-      </div>
-
-      <div class="col-lg-6 col-md-12" >
-        <div class="service-item position-relative">
-          <div class="icon"><i class="fas fa-heartbeat"></i></div>
-          <h3>Médecine interne</h3>
-          <p>Prise en charge des pathologies complexes et des maladies chroniques.</p>
-        </div>
-      </div>
-
-      <div class="col-lg-6 col-md-12" >
-        <div class="service-item position-relative">
-          <div class="icon"><i class="fas fa-syringe"></i></div>
-          <h3>Vaccinations & dépistages</h3>
-          <p>Mise à jour vaccinale, dépistages ciblés selon votre profil et votre âge.</p>
-        </div>
-      </div>
-      <div class="col-lg-6 col-md-12" >
-        <div class="service-item position-relative">
-          <div class="icon"><i class="fas fa-band-aid"></i></div>
-          <h3>Pharmacie</h3>
-          <p>Achat de médicaments.</p>
-        </div>
-      </div>
     </div>
-  </div>
 </section>
 
-
-<section id="faq" class="faq section light-background">
-  <div class="container section-title" >
-    <h2>Questions fréquentes</h2>
-    <p>Informations pratiques pour préparer votre venue.</p>
-  </div>
-
-  <div class="container">
-    <div class="row justify-content-center">
-      <div class="col-lg-10" >
-        <div class="faq-container">
-          <div class="faq-item faq-active">
-            <h3>Quels documents apporter ?</h3>
-            <div class="faq-content">
-              <p>Carte Vitale, pièce d’identité, liste de médicaments et comptes rendus récents.</p>
-            </div>
-            <i class="faq-toggle bi bi-chevron-right"></i>
-          </div>
-          <div class="faq-item">
-            <h3>Proposez-vous la téléconsultation ?</h3>
-            <div class="faq-content">
-              <p>Oui, vous pouvez prendre un rendez-vous en ligne ou contactez le secrétariat.</p>
-            </div>
-            <i class="faq-toggle bi bi-chevron-right"></i>
-          </div>
-          <div class="faq-item">
-            <h3>Quels sont les délais pour un rendez-vous ?</h3>
-            <div class="faq-content">
-              <p>La plupart des motifs obtiennent un créneau sous quelques jours. Urgences : appelez.</p>
-            </div>
-            <i class="faq-toggle bi bi-chevron-right"></i>
-          </div>
+{# ===== Services ===== #}
+<section class="section">
+    <div class="container">
+        <div class="section-head" data-controller="reveal">
+            <p class="eyebrow">Nos services</p>
+            <h2>Un accompagnement complet, de la prévention au suivi</h2>
+            <p>Prévention, diagnostic, traitement et suivi : nous restons votre point de contact à chaque étape.</p>
         </div>
-
-      </div>
+        <div class="services">
+            <article class="service" data-controller="reveal">
+                <span class="service__num">01</span>
+                <h3>Médecine générale</h3>
+                <p>Suivi adulte et enfant, certificats, renouvellements d'ordonnances et conseils de prévention.</p>
+            </article>
+            <article class="service" data-controller="reveal">
+                <span class="service__num">02</span>
+                <h3>Spécialistes</h3>
+                <p>Pédiatrie, cardiologie et dermatologie sur place, en lien direct avec votre médecin traitant.</p>
+            </article>
+            <article class="service" data-controller="reveal">
+                <span class="service__num">03</span>
+                <h3>Vaccins et dépistages</h3>
+                <p>Mise à jour vaccinale et dépistages ciblés, adaptés à votre âge et à vos facteurs de risque.</p>
+            </article>
+            <article class="service" data-controller="reveal">
+                <span class="service__num">04</span>
+                <h3>Pharmacie en ligne</h3>
+                <p>Commandez vos médicaments et produits de santé, retrouvez vos factures dans votre espace.</p>
+            </article>
+        </div>
     </div>
-  </div>
 </section>
 
-
-<section id="contact" class="contact section">
-  <div class="container section-title">
-    <h2>L'accès au cabinet médical</h2>
-    <p>Adresse, téléphone et Plan.</p>
-  </div>
-
-  
-
-  <div class="container" >
-    <div class="row gy-4">
-      <div class="col-lg-4">
-        <div class="info-item d-flex">
-          <i class="bi bi-geo-alt flex-shrink-0"></i>
-          <div>
-            <h3>Adresse</h3>
-            <p>7, rue des archives / 53000 / Laval</p>
-          </div>
+{# ===== Médecins ===== #}
+<section class="section section--tint">
+    <div class="container">
+        <div class="section-head section-head--split" data-controller="reveal">
+            <div>
+                <p class="eyebrow">Votre équipe</p>
+                <h2>Des médecins à l'écoute</h2>
+                <p>Un suivi global, une communication claire et des délais courts.</p>
+            </div>
+            <a href="{{ path('app_medecin') }}" class="link-arrow">Voir toute l'équipe <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
         </div>
-
-        <div class="info-item d-flex" >
-          <i class="bi bi-telephone flex-shrink-0"></i>
-          <div>
-            <h3>Téléphone</h3>
-            <p>02 99 99 99 99</p>
-          </div>
+        <div class="doctors">
+            {% for m in medecins %}
+                {% include 'components/_doctor_card.html.twig' with {m: m} only %}
+            {% else %}
+                <p>Nos médecins arrivent bientôt.</p>
+            {% endfor %}
         </div>
-
-        <div class="info-item d-flex" >
-          <i class="bi bi-envelope flex-shrink-0"></i>
-          <div>
-            <h3>Email</h3>
-            <p>cabinetmartinoneline535gmail.com</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-lg-8" id="gmap">
-        
-    
-    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2665.986843668288!2d-0.7633576883544411!3d48.0718968556119!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4808fdfbc1fa6b87%3A0x1cca4f4697d0baa6!2sCabinetMartinA%2C%207%20Rue%20des%20Archives%2C%2053000%20Laval!5e0!3m2!1sfr!2sfr!4v1761783470134!5m2!1sfr!2sfr" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-  
-      </div> 
     </div>
-  </div>
 </section>
-</div>
 
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  const container = document.querySelector('.faq-container') || document;
+{# ===== Pharmacie ===== #}
+{% if produits is not empty %}
+<section class="section">
+    <div class="container">
+        <div class="section-head section-head--split" data-controller="reveal">
+            <div>
+                <p class="eyebrow">Pharmacie en ligne</p>
+                <h2>Sélection du moment</h2>
+                <p>Commandez en quelques clics, retrouvez votre facture dans votre espace patient.</p>
+            </div>
+            <a href="{{ path('app_pharmacie') }}" class="link-arrow">Toute la pharmacie <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+        </div>
+        <div class="products">
+            {% for p in produits %}
+                {% include 'components/_product_card.html.twig' with {p: p, cat: p.categorie.id} only %}
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
 
-  // Init accessibilité + état affiché/masqué
-  document.querySelectorAll('.faq-item').forEach(el => {
-    const h3 = el.querySelector('h3');
-    const content = el.querySelector('.faq-content');
+{# ===== FAQ ===== #}
+<section class="section section--sand">
+    <div class="container">
+        <div class="section-head" data-controller="reveal">
+            <p class="eyebrow">Questions fréquentes</p>
+            <h2>Préparer votre venue</h2>
+            <p>Les réponses aux questions que l'on nous pose le plus souvent.</p>
+        </div>
+        <div class="faq" data-controller="reveal">
+            <details>
+                <summary>Quels documents apporter ? <i class="bi bi-plus-lg" aria-hidden="true"></i></summary>
+                <p>Votre carte Vitale, une pièce d'identité, la liste de vos médicaments en cours et vos comptes rendus récents.</p>
+            </details>
+            <details>
+                <summary>Proposez-vous la téléconsultation ? <i class="bi bi-plus-lg" aria-hidden="true"></i></summary>
+                <p>La téléconsultation vidéo arrive bientôt. En attendant, vous pouvez réserver un rendez-vous en cabinet en ligne ou contacter le secrétariat.</p>
+            </details>
+            <details>
+                <summary>Quels sont les délais pour un rendez-vous ? <i class="bi bi-plus-lg" aria-hidden="true"></i></summary>
+                <p>La plupart des motifs obtiennent un créneau sous quelques jours. En cas d'urgence, appelez-nous ; en cas d'urgence vitale, composez le 15.</p>
+            </details>
+            <details>
+                <summary>Comment retrouver ma facture de pharmacie ? <i class="bi bi-plus-lg" aria-hidden="true"></i></summary>
+                <p>Toutes vos factures sont disponibles en PDF dans votre espace patient, rubrique « Mes factures ».</p>
+            </details>
+        </div>
+    </div>
+</section>
 
-    if (h3) {
-      h3.setAttribute('role', 'button');
-      h3.setAttribute('tabindex', '0');
-      h3.setAttribute('aria-expanded', el.classList.contains('faq-active') ? 'true' : 'false');
-    }
-    if (content) {
-      content.hidden = !el.classList.contains('faq-active');
-    }
-  });
-
-  function activate(item) {
-    document.querySelectorAll('.faq-item').forEach(el => {
-      const isActive = el === item;
-      el.classList.toggle('faq-active', isActive);
-
-      const h3 = el.querySelector('h3');
-      const content = el.querySelector('.faq-content');
-      if (h3) h3.setAttribute('aria-expanded', isActive ? 'true' : 'false');
-      if (content) content.hidden = !isActive;
-    });
-  }
-
-  // Clic sur l’item (ou un enfant)
-  container.addEventListener('click', (e) => {
-    const item = e.target.closest('.faq-item');
-    if (!item) return;
-    activate(item);
-  });
-
-  // Clavier sur le titre
-  container.addEventListener('keydown', (e) => {
-    if (e.key !== 'Enter' && e.key !== ' ') return;
-    const h3 = e.target.closest('.faq-item h3');
-    if (!h3) return;
-    e.preventDefault();
-    activate(h3.closest('.faq-item'));
-  });
-});
-
-var iframe = document.getElementById('gmap');
-iframe.addEventListener('load', () => {
-    alert('ok');
-    document.querySelector('.place-name').textContent = 'Cabinet Martin';
-    
-  });
-    
-</script>
+{# ===== Accès ===== #}
+<section class="section">
+    <div class="container">
+        <div class="section-head" data-controller="reveal">
+            <p class="eyebrow">Nous trouver</p>
+            <h2>L'accès au cabinet</h2>
+        </div>
+        <div class="contact-grid">
+            <div class="contact-info" data-controller="reveal">
+                <ul>
+                    <li><i class="bi bi-geo-alt" aria-hidden="true"></i><div><strong>Adresse</strong><p>7, rue des Archives<br>53 000 Laval</p></div></li>
+                    <li><i class="bi bi-telephone" aria-hidden="true"></i><div><strong>Téléphone</strong><p><a href="tel:+33299999999">02 99 99 99 99</a></p></div></li>
+                    <li><i class="bi bi-envelope" aria-hidden="true"></i><div><strong>Email</strong><p><a href="mailto:contact@cabinet-martin.fr">contact@cabinet-martin.fr</a></p></div></li>
+                    <li><i class="bi bi-clock" aria-hidden="true"></i><div><strong>Horaires</strong><p>Lun–Ven 8h–18h<br>Sam 8h–12h</p></div></li>
+                </ul>
+            </div>
+            <div class="map-frame" data-controller="reveal">
+                <iframe title="Plan d'accès au Cabinet Martin, 7 rue des Archives à Laval"
+                    src="https://www.openstreetmap.org/export/embed.html?bbox=-0.7760%2C48.0660%2C-0.7500%2C48.0780&amp;layer=mapnik&amp;marker=48.0719%2C-0.7634"
+                    loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+            </div>
+        </div>
+    </div>
+</section>
 {% endblock %}

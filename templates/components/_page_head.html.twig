@@ -1,0 +1,22 @@
+{# Paramètres : title, eyebrow (opt.), lead (opt.), crumbs (opt. : liste de [libellé, url|null]) #}
+<section class="page-head">
+    <div class="container">
+        {% if crumbs is defined and crumbs %}
+            <nav aria-label="Fil d'Ariane">
+                <ol class="breadcrumb-c">
+                    <li><a href="{{ path('app_home') }}">Accueil</a></li>
+                    {% for crumb in crumbs %}
+                        {% if crumb[1] %}
+                            <li><a href="{{ crumb[1] }}">{{ crumb[0] }}</a></li>
+                        {% else %}
+                            <li aria-current="page">{{ crumb[0] }}</li>
+                        {% endif %}
+                    {% endfor %}
+                </ol>
+            </nav>
+        {% endif %}
+        {% if eyebrow is defined and eyebrow %}<p class="eyebrow">{{ eyebrow }}</p>{% endif %}
+        <h1>{{ title }}</h1>
+        {% if lead is defined and lead %}<p>{{ lead }}</p>{% endif %}
+    </div>
+</section>
